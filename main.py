@@ -73,18 +73,17 @@ class Bus(Actor):
         busses.pop(len(0))
 
 class Overlay(sf.Drawable):
-    def __init__(self, view):
-        self.view = view
+    def __init__(self, actor):
+        self.actor = actor
 
-        texture = sf.Texture.from_file("overlay.png")
-        self.sprite = sf.Sprite(texture)
+        self.texture = sf.Texture.from_file("overlay.png")
+        self.sprite = sf.Sprite(self.texture)
 
     def draw(self, target, states):
-        self.sprite.position = \
-            self.view.center - (WIDTH/2, HEIGHT/2)
+        center = (self.actor.sprite.position.x + self.actor.sprite.size.x / 2,
+                  self.actor.sprite.position.y + self.actor.sprite.size.y / 2)
+        self.sprite.position = center - self.texture.size / 2
         target.draw(self.sprite)
-
-busses = []
 
 background_texture = sf.Texture.from_file("map1.png")
 background = sf.Sprite(background_texture)
@@ -92,7 +91,8 @@ background = sf.Sprite(background_texture)
 view = sf.View()
 view.reset(sf.Rectangle((0, 0), (WIDTH, HEIGHT)))
 window.view = view
-overlay = Overlay(view)
+
+overlay = Overlay(player)
 
 timer = sf.Clock()
 # start the game loop
@@ -139,13 +139,22 @@ while window.is_open:
 
     print(delta)
     player.move(delta.x, delta.y)
-    view.move(view_delta.x * player.velocity, view_delta.y * player.velocity)    
+    view.move(view_delta.x, view_delta.y)    
 
     window.clear() # clear screen
     window.draw(background)
     window.draw(player) # draw the sprite
-    window.draw(overlay)
     for bus in busses:
         window.draw(bus)
+    window.draw(overlay)
+
+    window.view = window.default_view
+    debug_text = sf.Text("Pos: %s, Period: %i" % (player.sprite.position, PERIOD_OF_TIME))
+    debug_text.color = sf.Color.RED
+    debug_text.position = (0, HEIGHT - 20)
+    debug_text.character_size = 12
+    window.draw(debug_text)
+
+
     window.display() # update the window
 
