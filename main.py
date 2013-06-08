@@ -4,6 +4,10 @@ import sfml as sf
 
 WIDTH = 640
 HEIGHT = 480
+
+MAP_WIDTH = WIDTH * 4
+MAP_HEIGHT = HEIGHT * 4
+
 PERIOD_OF_TIME = 0
 # create the main window
 window = sf.RenderWindow(sf.VideoMode(WIDTH, HEIGHT), "pySFML Window")
@@ -34,8 +38,6 @@ class Player(Actor):
         target.draw(self.sprite, states)
 player = Player()
 
-background_texture = sf.Texture.from_file("map1.png")
-background = sf.Sprite(background_texture)
 
 class Bus():
     def __init__(self):
@@ -44,16 +46,23 @@ class Bus():
     def get_number(self):
         pass
 
+player = Player()
 
+background_texture = sf.Texture.from_file("map1.png")
+background = sf.Sprite(background_texture)
+
+view = sf.View()
+view.reset(sf.Rectangle((0, 0), (WIDTH, HEIGHT)))
+window.view = view
 
 timer = sf.Clock()
 # start the game loop
 while window.is_open:
-    print("Time: " + str(timer) + ", Period: " + str(PERIOD_OF_TIME))
 
     if timer.elapsed_time >= sf.seconds(5):
         PERIOD_OF_TIME += 1
         timer.restart()
+        print("Period: " + str(PERIOD_OF_TIME))
 
 # process events
     for event in window.events:
