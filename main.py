@@ -37,23 +37,36 @@ player = Player()
 background_texture = sf.Texture.from_file("map1.png")
 background = sf.Sprite(background_texture)
 
-class Bus():
-    def __init__(self):
-        pass
+class Bus(Actor):
+    def __init__(self, start_number):
+        Actor.__init__(self)
+        slef.start_number = 0
+
+        self.sprite = sf.RectangleShape()
+        self.sprite.size = (50, 50)
+        self.sprite.outline_color = sf.Color.BLUE
+        slef.sprite.outline_thickness = 2
+        self.sprite.position = (342, 100)
+
+    def draw(self, target, states):
+        target.draw(self.sprite, states)
 
     def get_number(self):
-        pass
+        self.start_number = PERIOD_OF_TIME
+
+bus = Bus(PERIOD_OF_TIME)
 
 
 
 timer = sf.Clock()
 # start the game loop
 while window.is_open:
-    print("Time: " + str(timer) + ", Period: " + str(PERIOD_OF_TIME))
+    #print("Time: " + str(timer) + ", Period: " + str(PERIOD_OF_TIME))
 
-    if timer.elapsed_time >= sf.seconds(5):
+    if timer.elapsed_time >= sf.seconds(15):
         PERIOD_OF_TIME += 1
         timer.restart()
+        window.draw(bus)
 
 # process events
     for event in window.events:
