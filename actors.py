@@ -4,7 +4,7 @@ class Actor(sf.Drawable):
     def __init__(self):
         sf.Drawable.__init__(self)
 
-        self.sprite = sf.Sprite()
+        self.sprite = sf.CircleShape()
 
     def move(self, dx, dy):
         self.position += (dx, dy)
@@ -32,7 +32,6 @@ class Player(Actor):
     def draw(self, target, states):
         target.draw(self.sprite, states)
 
-"""
 class Bus(Actor):
     def __init__(self, start_number):
         Actor.__init__(self)
@@ -58,5 +57,5 @@ class Bus(Actor):
         return self.start_number
 
     def disappear(self):
-        busses.pop(len(0))
-"""
+        del self
+

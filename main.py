@@ -52,8 +52,8 @@ class Overlay(sf.Drawable):
         target.draw(self.sprite)
 
 def main():
-    PERIOD_OF_TIME = 0
-    CAUGHT_A_BUS = False
+    bus_period = 0
+    player_caught_bus = True
     busses = []
 
     window = sf.RenderWindow(sf.VideoMode(WIDTH, HEIGHT), "A Walk In The Dark")
@@ -74,10 +74,10 @@ def main():
         debug = []
 
         if timer.elapsed_time >= sf.seconds(15):
-            PERIOD_OF_TIME += 1
+            bus_period += 1
             timer.restart()
-            bus = Bus(PERIOD_OF_TIME)
-            print("Bus's numbers are: " + str(bus.get_number()))
+            bus = Bus(bus_period)
+            print("Bus' number is: " + str(bus.get_number()))
             busses.append(bus)
 
         for event in window.events:
@@ -86,7 +86,7 @@ def main():
                 sys.exit(0)
 
         debug.append("Pos: %s" % player.position)
-        debug.append("Period: %i" % PERIOD_OF_TIME)
+        debug.append("Period: %i" % bus_period)
 
         delta = sf.Vector2()
         if sf.Keyboard.is_key_pressed(sf.Keyboard.LEFT) \
@@ -123,7 +123,7 @@ def main():
         view.move(view_delta.x, view_delta.y)    
 
         debug.append("Pos: %s" % player.sprite.position)
-        debug.append("Period: %i" % PERIOD_OF_TIME)
+        debug.append("Period: %i" % bus_period)
 
 
         for bus in busses:
