@@ -1,9 +1,12 @@
 #!/usr/bin/env python2
+import math
+import random
 import sys
 
 import sfml as sf
 
 from actors import *
+from helpers import *
 
 WIDTH = 640
 HEIGHT = 480
@@ -11,32 +14,18 @@ HEIGHT = 480
 MAP_WIDTH = 960
 MAP_HEIGHT = 1280
 
-class Bus(Actor):
-    def __init__(self, start_number):
+BUS_IMAGE = sf.Image.from_file("bus.png")
+
+class Creature(Actor):
+    def __init__(self):
         Actor.__init__(self)
-
-        self.start_number = start_number
-
         self.sprite = sf.RectangleShape()
-        self.sprite.size = (50, 50)
-        self.sprite.outline_color = sf.Color.BLUE
-        self.sprite.outline_thickness = 2
-        self.sprite.position = (342, 100)
+        self.sprite.size = (5, 5)
+        self.sprite.fill_color = sf.Color.BLUE
+        self.sprite.position = (random.randrange(0, MAP_WIDTH), random.randrange(0, MAP_HEIGHT))
 
     def draw(self, target, states):
         target.draw(self.sprite, states)
-
-    def move(self):
-        if (self.position.x > 342 and self.position.y > 0):
-            super(self, Bus).move(0, 1)
-        else:
-            self.disappear()
-
-    def get_number(self):
-        return self.start_number
-
-    def disappear(self):
-        del self
 
 class Overlay(sf.Drawable):
     def __init__(self, actor):
@@ -55,10 +44,17 @@ def main():
     bus_period = 0
     player_caught_bus = True
     busses = []
-
+    creatures = []
     window = sf.RenderWindow(sf.VideoMode(WIDTH, HEIGHT), "A Walk In The Dark")
 
+    def end_game():
+        window.close()
+
     player = Player(WIDTH / 2, HEIGHT / 2)
+    
+    for i in range (0, 20):
+        creature = Creature()
+        creatures.append(creature)
 
     background = sf.Sprite(sf.Texture.from_file("map1.png"))
 
@@ -69,6 +65,7 @@ def main():
     overlay = Overlay(player)
 
     timer = sf.Clock()
+    timer2 = sf.Clock()
 
     while window.is_open:
         debug = []
@@ -76,14 +73,27 @@ def main():
         if timer.elapsed_time >= sf.seconds(15):
             bus_period += 1
             timer.restart()
-            bus = Bus(bus_period)
-            print("Bus' number is: " + str(bus.get_number()))
+            bus = Bus(342, MAP_HEIGHT, bus_period)
             busses.append(bus)
+
+        for c in creatures:
+            if c.collides_with(player):
+                print("You were eaten, sorry(((")
+                end_game()
+
+        for b in busses:
+            if b.collides_with(player):
+                print("You were knocked down by the bus, sorry(((")
+                end_game()
+
+        for c in creatures:
+            for b in busses:
+                if b.collides_with(c):
+                    creatures.remove(c)
 
         for event in window.events:
             if type(event) is sf.CloseEvent:
-                window.close()
-                sys.exit(0)
+                end_game()
 
         debug.append("Pos: %s" % player.position)
         debug.append("Period: %i" % bus_period)
@@ -110,6 +120,7 @@ def main():
             delta *= 8
         else:
             delta *= 2
+
         view_delta = sf.Vector2()
         if player.sprite.position.x > WIDTH / 2 \
                 and player.sprite.position.x < MAP_WIDTH - WIDTH / 2:
@@ -127,26 +138,45 @@ def main():
 
 
         for bus in busses:
-            bus.move()
+            if bus.sprite.position.y > 0:
+                bus.move()
+            else:
+                busses.remove(bus)                
 
-        window.clear() # clear screen
+        #Monster movement
+        if timer2.elapsed_time >= sf.milliseconds(50):
+            for c in creatures:
+                step = sf.Vector2(random.randrange(-1, 1), random.randrange(-1, 1))
+                if step.x == -1 and c.sprite.position.x > 0:
+                    c.move(step.x, 0)
+                if step.x == 1 and c.sprite.position.x < MAP_WIDTH:
+                    c.move(step.x, 0)
+                if step.y == -1 and c.sprite.position.y > 0:
+                    c.move(0, step.y)
+                if step.y == 1 and c.sprite.positiony < MAP_HEIGHT:
+                    c.move(0, step.y)
+
+            timer2.restart()
+             
+        window.clear()
         window.draw(background)
-        window.draw(player) # draw the sprite
+        window.draw(player)
         for bus in busses:
             window.draw(bus)
+        for creature in creatures:
+            window.draw(creature)
         window.draw(overlay)
 
         window.view = window.default_view
+
         debug_text = sf.Text(", ".join(debug))
         debug_text.color = sf.Color.RED
         debug_text.position = (0, HEIGHT - 20)
         debug_text.character_size = 12
         window.draw(debug_text)
 
-
         window.display()
 
 
 if __name__ == "__main__":
     main()
-
