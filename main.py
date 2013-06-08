@@ -39,12 +39,24 @@ class Player(Actor):
 player = Player()
 
 
-class Bus():
-    def __init__(self):
-        pass
+class Bus(Actor):
+    def __init__(self, start_number):
+        Actor.__init__(self)
+        slef.start_number = 0
+
+        self.sprite = sf.RectangleShape()
+        self.sprite.size = (50, 50)
+        self.sprite.outline_color = sf.Color.BLUE
+        slef.sprite.outline_thickness = 2
+        self.sprite.position = (342, 100)
+
+    def draw(self, target, states):
+        target.draw(self.sprite, states)
 
     def get_number(self):
-        pass
+        self.start_number = PERIOD_OF_TIME
+
+busses = []
 
 player = Player()
 
@@ -59,10 +71,12 @@ timer = sf.Clock()
 # start the game loop
 while window.is_open:
 
-    if timer.elapsed_time >= sf.seconds(5):
+    if timer.elapsed_time >= sf.seconds(15):
         PERIOD_OF_TIME += 1
         timer.restart()
         print("Period: " + str(PERIOD_OF_TIME))
+
+        bus = Bus(PERIOD_OF_TIME)
 
 # process events
     for event in window.events:
@@ -88,5 +102,7 @@ while window.is_open:
     window.clear() # clear screen
     window.draw(background)
     window.draw(player) # draw the sprite
+    for bus in busses:
+        window.draw(bus)
     window.display() # update the window
 
