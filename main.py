@@ -1,6 +1,9 @@
 #!/usr/bin/env python2
+import sys
+
 import sfml as sf
 
+from actors import *
 
 WIDTH = 640
 HEIGHT = 480
@@ -8,46 +11,11 @@ HEIGHT = 480
 MAP_WIDTH = 960
 MAP_HEIGHT = 1280
 
-PERIOD_OF_TIME = 0
-COUGHT_A_BUS = False
-busses = []
-# create the main window
-window = sf.RenderWindow(sf.VideoMode(WIDTH, HEIGHT), "pySFML Window")
-
-class Actor(sf.Drawable):
-    def __init__(self):
-        sf.Drawable.__init__(self)
-
-        self.velocity = 1
-
-    def move(self, dx, dy):
-        self.sprite.position += (dx, dy) * self.velocity
-
-    def draw(self, target, states):
-        target.draw(self.sprite, states)
-
-class Player(Actor):
-    def __init__(self):
-        Actor.__init__(self)
-
-        self.sprite = sf.RectangleShape()
-        self.sprite.size = (30, 30)
-        self.sprite.fill_color = sf.Color.RED
-        self.sprite.position = (WIDTH / 2, HEIGHT / 2)
-
-    def draw(self, target, states):
-        target.draw(self.sprite, states)
-
-    def got_bus(self, Bus):
-        COUGHT_A_BUS = True
-        
-player = Player()
-
 class Bus(Actor):
     def __init__(self, start_number):
         Actor.__init__(self)
 
-        self.start_number = PERIOD_OF_TIME
+        self.start_number = start_number
 
         self.sprite = sf.RectangleShape()
         self.sprite.size = (50, 50)
@@ -58,17 +26,17 @@ class Bus(Actor):
     def draw(self, target, states):
         target.draw(self.sprite, states)
 
-    def bus_move(self):
+    def move(self):
         if (self.position.x > 342 and self.position.y > 0):
-            self.move(0, 1)
+            super(self, Bus).move(0, 1)
         else:
-            self.dissapear()
+            self.disappear()
 
     def get_number(self):
         return self.start_number
 
-    def dessapear(self):
-        busses.pop(len(0))
+    def disappear(self):
+        del self
 
 class Overlay(sf.Drawable):
     def __init__(self, actor):
@@ -83,84 +51,93 @@ class Overlay(sf.Drawable):
         self.sprite.position = center - self.texture.size / 2
         target.draw(self.sprite)
 
-background_texture = sf.Texture.from_file("map1.png")
-background = sf.Sprite(background_texture)
+def main():
+    PERIOD_OF_TIME = 0
+    CAUGHT_A_BUS = False
+    busses = []
+   
+    window = sf.RenderWindow(sf.VideoMode(WIDTH, HEIGHT), "A Walk In The Dark")
+            
+    player = Player(WIDTH / 2, HEIGHT / 2)
 
-view = sf.View()
-view.reset(sf.Rectangle((0, 0), (WIDTH, HEIGHT)))
-window.view = view
+    background = sf.Sprite(sf.Texture.from_file("map1.png"))
 
-overlay = Overlay(player)
+    view = sf.View()
+    view.reset(sf.Rectangle((0, 0), (WIDTH, HEIGHT)))
+    window.view = view
 
-timer = sf.Clock()
-# start the game loop
-while window.is_open:
-    debug_text = ""
+    overlay = Overlay(player)
 
-    if timer.elapsed_time >= sf.seconds(15):
-        PERIOD_OF_TIME += 1
-        timer.restart()
-        print("Period: " + str(PERIOD_OF_TIME))
-        bus = Bus(PERIOD_OF_TIME)
-        print("Bus's numbers are: " + str(bus.get_number()))
-        busses.append(bus)
-        
-# process events
-    for event in window.events:
-        if type(event) is sf.CloseEvent:
+    timer = sf.Clock()
+
+    while window.is_open:
+        debug_text = ""
+
+        if timer.elapsed_time >= sf.seconds(15):
+            PERIOD_OF_TIME += 1
             timer.restart()
-            PERIOD_OF_TIME = 0
-            busses = []
+            print("Period: " + str(PERIOD_OF_TIME))
+            bus = Bus(PERIOD_OF_TIME)
+            print("Bus's numbers are: " + str(bus.get_number()))
+            busses.append(bus)
+            
+        for event in window.events:
+            if type(event) is sf.CloseEvent:
+                window.close()
+                sys.exit(0)
+
+        delta = sf.Vector2()
+        if sf.Keyboard.is_key_pressed(sf.Keyboard.LEFT) and player.sprite.position.x > 0:
+            delta += (-1,0)
+        elif sf.Keyboard.is_key_pressed(sf.Keyboard.RIGHT) and player.sprite.position.x + player.sprite.size.x < MAP_WIDTH:
+            delta += (1,0)
+        if sf.Keyboard.is_key_pressed(sf.Keyboard.UP) and player.sprite.position.y > 0:
+            delta += (0,-1)
+        elif sf.Keyboard.is_key_pressed(sf.Keyboard.DOWN) and player.sprite.position.y + player.sprite.size.y < MAP_HEIGHT:
+            delta += (0,1)
+            
+        elif sf.Keyboard.is_key_pressed(sf.Keyboard.ESCAPE):
             window.close()
 
-    delta = sf.Vector2()
-    if sf.Keyboard.is_key_pressed(sf.Keyboard.LEFT) and player.sprite.position.x > 0:
-        delta += (-1,0)
-    elif sf.Keyboard.is_key_pressed(sf.Keyboard.RIGHT) and player.sprite.position.x + player.sprite.size.x < MAP_WIDTH:
-        delta += (1,0)
-    if sf.Keyboard.is_key_pressed(sf.Keyboard.UP) and player.sprite.position.y > 0:
-        delta += (0,-1)
-    elif sf.Keyboard.is_key_pressed(sf.Keyboard.DOWN) and player.sprite.position.y + player.sprite.size.y < MAP_HEIGHT:
-        delta += (0,1)
+        if sf.Keyboard.is_key_pressed(sf.Keyboard.L_SHIFT):
+            debug_text += ", sprint"
+            player.velocity = 8
+        else:
+            player.velocity = 2
         
-    elif sf.Keyboard.is_key_pressed(sf.Keyboard.ESCAPE):
-        window.close()
+        view_delta = sf.Vector2()
+        if player.sprite.position.x > WIDTH / 2 and player.sprite.position.x < MAP_WIDTH - WIDTH / 2:
+            view_delta += (delta.x, 0)
+        if player.sprite.position.y > HEIGHT / 2 and player.sprite.position.y < MAP_HEIGHT - HEIGHT / 2:
+            view_delta += (0, delta.y)
 
-    if sf.Keyboard.is_key_pressed(sf.Keyboard.L_SHIFT):
-        debug_text += ", sprint"
-        player.velocity = 8
-    else:
-        player.velocity = 2
-    
-    view_delta = sf.Vector2()
-    if player.sprite.position.x > WIDTH / 2 and player.sprite.position.x < MAP_WIDTH - WIDTH / 2:
-        view_delta += (delta.x, 0)
-    if player.sprite.position.y > HEIGHT / 2 and player.sprite.position.y < MAP_HEIGHT - HEIGHT / 2:
-        view_delta += (0, delta.y)
+        print(delta, player.velocity)
+        player.move(delta.x, delta.y)
+        view.move(view_delta.x, view_delta.y)    
 
-    print(delta, player.velocity)
-    player.move(delta.x, delta.y)
-    view.move(view_delta.x, view_delta.y)    
-
-    for bus in busses:
-        bus.bus_move()  
+        for bus in busses:
+            bus.move()  
 
 
-    window.clear() # clear screen
-    window.draw(background)
-    window.draw(player) # draw the sprite
-    for bus in busses:
-        window.draw(bus)
-    window.draw(overlay)
+        window.clear() # clear screen
+        window.draw(background)
+        window.draw(player) # draw the sprite
+        for bus in busses:
+            window.draw(bus)
+        window.draw(overlay)
 
-    window.view = window.default_view
-    debug_text_full = sf.Text("Pos: %s, Period: %i%s"
-            % (player.sprite.position, PERIOD_OF_TIME, debug_text))
-    debug_text_full.color = sf.Color.RED
-    debug_text_full.position = (0, HEIGHT - 20)
-    debug_text_full.character_size = 12
-    window.draw(debug_text_full)
+        window.view = window.default_view
+        debug_text_full = sf.Text("Pos: %s, Period: %i%s"
+                % (player.sprite.position, PERIOD_OF_TIME, debug_text))
+        debug_text_full.color = sf.Color.RED
+        debug_text_full.position = (0, HEIGHT - 20)
+        debug_text_full.character_size = 12
+        window.draw(debug_text_full)
 
 
-    window.display() # update the window
+        window.display()
+
+
+if __name__ == "__main__":
+    main()
 
