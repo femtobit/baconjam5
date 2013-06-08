@@ -34,9 +34,8 @@ class Player(Actor):
         target.draw(self.sprite, states)
 player = Player()
 
-background = sf.RectangleShape()
-background.size = (WIDTH, HEIGHT)
-background.fill_color = sf.Color.GREEN
+background_texture = sf.Texture.from_file("map1.png")
+background = sf.Sprite(background_texture)
 
 class Bus():
     def __init__(self):
@@ -47,13 +46,15 @@ class Bus():
 
 
 
+timer = sf.Clock()
 # start the game loop
 while window.is_open:
-timer = sf.Clock()
-print timer
-if timer == 5000:
-    PERIOD_OF_TIME += 1 
-    timer.restart()
+    print("Time: " + str(timer) + ", Period: " + str(PERIOD_OF_TIME))
+
+    if timer.elapsed_time >= sf.seconds(5):
+        PERIOD_OF_TIME += 1
+        timer.restart()
+
 # process events
     for event in window.events:
         if type(event) is sf.CloseEvent:
