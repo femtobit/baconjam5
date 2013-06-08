@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+import datetime
 import math
 import random
 import sys
@@ -13,16 +14,6 @@ WIDTH = 640
 HEIGHT = 480
 
 BUS_IMAGE = sf.Image.from_file("bus.png")
-# create the main window
-window = sf.RenderWindow(sf.VideoMode(WIDTH, HEIGHT), "pySFML Window")
-
-def end_game():
-    timer.restart()
-    timer2.restart()
-    busses = []
-    creatures = []
-    PERIOD_OF_TIME = 0
-    window.close()
 
 class Overlay(sf.Drawable):
     def __init__(self, actor):
@@ -38,18 +29,24 @@ class Overlay(sf.Drawable):
         target.draw(self.sprite)
 
 def main():
+    random.seed(datetime.datetime.now())
+
     PERIOD_OF_TIME = 0
     CAUGHT_A_BUS = False
     busses = []
     creatures = []
 
     window = sf.RenderWindow(sf.VideoMode(WIDTH, HEIGHT), "A Walk In The Dark")
-
-    player = Player(WIDTH / 2, HEIGHT / 2, 5)
     
-    for i in range (0, 20):
+    def end_game():
+        window.close()
+
+    player = Player(WIDTH / 2, HEIGHT / 2)
+    
+    for i in range (0, NUMBER_OF_GRUES):
         creature = Grue(random.randrange(0, MAP_WIDTH),
                 random.randrange(0, MAP_HEIGHT))
+        print("New Grue at (%s)" % (creature.position))
         creatures.append(creature)
 
     background = sf.Sprite(sf.Texture.from_file("map2.png"))
@@ -73,6 +70,7 @@ def main():
             busses.append(bus)'''
 
         for c in creatures:
+            debug.append("Grues: ")
             if c.collides_with(player):
                 print("You were eaten, sorry(((")
                 window.close()
@@ -141,10 +139,8 @@ def main():
                 bus.move()'''
 
         #Monster movement
-        if timer2.elapsed_time >= sf.milliseconds(50):
-            for c in creatures:
-                creature.step()
-            timer2.restart()
+        for creature in creatures:
+            creature.step()
              
         window.clear()
         window.draw(background)

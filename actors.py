@@ -4,6 +4,7 @@ import sfml as sf
 
 from constants import *
 from helpers import *
+import vector
 
 class Actor(sf.Drawable):
     def __init__(self):
@@ -12,7 +13,10 @@ class Actor(sf.Drawable):
         self.sprite = sf.CircleShape()
 
     def move(self, dr):
+        #print("Move actor by %s" % str(dr))
+        #print(self.sprite.position)
         self.sprite.position += dr
+        #print(self.sprite.position)
 
     def draw(self, target, states):
         target.draw(self.sprite, states)
@@ -70,16 +74,20 @@ class Monster(Actor):
         self.speed = 1
         self.damage = 5
 
+        self.direction = random_unit_vector()
+        self.direction_timer = sf.Clock()
+
     def step(self):
-        while True:
-            step = sf.Vector2(random.randrange(-1, 1), random.randrange(-1, 1))
-            if MAP_RECT.contains(self.position + step):
-                break
-        self.move(step)
+        if self.direction_timer.elapsed_time > sf.seconds(5) \
+                or not MAP_RECT.contains(self.position + (self.direction * self.speed * 10)):
+            self.direction = random_unit_vector()
+            self.direction_timer.restart()
+
+        self.move(self.direction * self.speed)
 
     def hunt_player(self, player):
         player_direction = player.position - self.position
-        delta = (player_direction / vector.norm(player_direction)) * self.speed
+        delta = (player_direction / norm(player_direction)) * self.speed
 
         self.move(delta)
 
@@ -98,7 +106,5 @@ class Grue(Monster):
         self.sprite.fill_color = sf.Color.BLUE
         self.sprite.position = (x, y)
 
-        self.speed = 0.5
-
-        self.speed = 1.5
+        self.speed = 2
         self.damage = 1
