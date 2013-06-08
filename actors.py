@@ -66,8 +66,16 @@ class Bus(Actor):
 
 class Monster(Actor):
     def __init__(self):
+        Actor.__init__(self)
         self.speed = 1
         self.damage = 5
+
+    def step(self):
+        while True:
+            step = sf.Vector2(random.randrange(-1, 1), random.randrange(-1, 1))
+            if MAP_RECT.contains(self.position + step):
+                break
+        self.move(step)
 
     def hunt_player(self, player):
         player_direction = player.position - self.position
