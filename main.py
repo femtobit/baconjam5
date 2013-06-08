@@ -16,10 +16,10 @@ class Actor(sf.Drawable):
     def __init__(self):
         sf.Drawable.__init__(self)
 
-        self.velocity = 8
+        self.velocity = 1
 
-    def move(self, dx, dy):
-        self.sprite.position += (dx, dy) * self.velocity
+    def move(self, delta):
+        self.sprite.position += delta * self.velocity
 
     def draw(self, target, states):
         target.draw(self.sprite, states)
@@ -36,18 +36,16 @@ class Player(Actor):
 
     def draw(self, target, states):
         target.draw(self.sprite, states)
-player = Player()
-
 
 class Bus(Actor):
     def __init__(self, start_number):
         Actor.__init__(self)
-        slef.start_number = 0
+        self.start_number = 0
 
         self.sprite = sf.RectangleShape()
         self.sprite.size = (50, 50)
         self.sprite.outline_color = sf.Color.BLUE
-        slef.sprite.outline_thickness = 2
+        self.sprite.outline_thickness = 2
         self.sprite.position = (342, 100)
 
     def draw(self, target, states):
@@ -65,7 +63,6 @@ background = sf.Sprite(background_texture)
 
 view = sf.View()
 view.reset(sf.Rectangle((0, 0), (WIDTH, HEIGHT)))
-window.view = view
 
 timer = sf.Clock()
 # start the game loop
@@ -85,24 +82,43 @@ while window.is_open:
             PERIOD_OF_TIME = 0
             window.close()
 
+    delta = sf.Vector2()
     if sf.Keyboard.is_key_pressed(sf.Keyboard.LEFT) and player.sprite.position.x > 0:
-        player.sprite.position += (-1,0)
-    elif sf.Keyboard.is_key_pressed(sf.Keyboard.RIGHT) and player.sprite.position.x < WIDTH:
-        player.sprite.position += (1,0)
-
+        delta += (-1,0)
+    elif sf.Keyboard.is_key_pressed(sf.Keyboard.RIGHT) and player.sprite.position.x < MAP_WIDTH:
+        delta += (1,0)
+        
     if sf.Keyboard.is_key_pressed(sf.Keyboard.UP) and player.sprite.position.y > 0:
-        player.sprite.position += (0,-1)
-    elif sf.Keyboard.is_key_pressed(sf.Keyboard.DOWN) and player.sprite.position.y < HEIGHT:
-        player.sprite.position += (0,1)
+        delta += (0,-1)
+    elif sf.Keyboard.is_key_pressed(sf.Keyboard.DOWN) and player.sprite.position.y < MAP_HEIGHT:
+        delta += (0,1)
         
     elif sf.Keyboard.is_key_pressed(sf.Keyboard.ESCAPE):
         window.close()
+
+    if sf.Keyboard.is_key_pressed(sf.Keyboard.L_SHIFT):
+        player.velocity = 8
+    else:
+        player.velocity = 2
+
+    print(delta)
+    player.move(delta)
+    view.move(delta.x * player.velocity, delta.y * player.velocity)
     
+    window.view = view
 
     window.clear() # clear screen
     window.draw(background)
     window.draw(player) # draw the sprite
     for bus in busses:
         window.draw(bus)
+
+    window.view = window.default_view
+    debug_text = sf.Text("Pos: %s, Period: %i" % (player.sprite.position, PERIOD_OF_TIME))
+    debug_text.color = sf.Color.RED
+    debug_text.position = (0, HEIGHT - 20)
+    debug_text.character_size = 12
+    window.draw(debug_text)
+
     window.display() # update the window
 
