@@ -27,13 +27,14 @@ class Actor(sf.Drawable):
                       <= collision_radius(self) + collision_radius(object) - 3
 
 class Player(Actor):
-    def __init__(self, x, y):
+    def __init__(self, x, y, health):
         Actor.__init__(self)
 
         self.sprite = sf.RectangleShape()
         self.sprite.size = (30, 30)
         self.sprite.fill_color = sf.Color.RED
         self.position = (x, y)
+        self.health = 5
 
     def draw(self, target, states):
         target.draw(self.sprite, states)
@@ -63,12 +64,21 @@ class Bus(Actor):
 def Monster(Actor):
     def __init__(self):
         self.speed = 1
+        self.damage = 5
 
     def hunt_player(self, player):
         player_direction = player.position - self.position
         delta = (player_direction / vector.norm(player_direction)) * self.speed
 
         self.move(delta.x, delta.y)
+
+    def bite(self, player):
+        if self.collides_with(player):
+            player.health -= self.damage
+            if player.health <= 0:
+                window.close()
+    
+            
 
 def Grue(Monster):
     def __init__(self, x, y):
@@ -80,3 +90,4 @@ def Grue(Monster):
         self.position = (x,y)
 
         self.speed = 1.5
+        self.damage = 1
