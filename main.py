@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 import sfml as sf
 
+
 WIDTH = 640
 HEIGHT = 480
 PERIOD_OF_TIME = 0
@@ -48,10 +49,16 @@ class Bus():
 
 # start the game loop
 while window.is_open:
+timer = sf.Clock()
+print timer
+if timer == 5000:
+    PERIOD_OF_TIME += 1 
+    timer.restart()
 # process events
     for event in window.events:
         if type(event) is sf.CloseEvent:
-            
+            timer.restart()
+            PERIOD_OF_TIME = 0
             window.close()
 
     if sf.Keyboard.is_key_pressed(sf.Keyboard.LEFT) and player.sprite.position.x > 0:
