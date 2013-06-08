@@ -5,8 +5,8 @@ import sfml as sf
 WIDTH = 640
 HEIGHT = 480
 
-MAP_WIDTH = WIDTH * 4
-MAP_HEIGHT = HEIGHT * 4
+MAP_WIDTH = 960
+MAP_HEIGHT = 1280
 
 PERIOD_OF_TIME = 0
 # create the main window
