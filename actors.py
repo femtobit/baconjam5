@@ -4,7 +4,6 @@ import sfml as sf
 
 from constants import *
 from helpers import *
-import vector
 
 class Actor(sf.Drawable):
     def __init__(self):
@@ -28,6 +27,13 @@ class Actor(sf.Drawable):
     @position.setter
     def position(self, pos):
         self.sprite.position = pos
+
+    @property
+    def size(self):
+        try:
+            return self.sprite.size
+        except AttributeError:
+            return self.sprite.texture.size
 
     def collides_with(self, object):
         return dist(self.sprite.position, object.sprite.position) \
@@ -100,11 +106,15 @@ class Monster(Actor):
 class Grue(Monster):
     def __init__(self, x, y):
         Monster.__init__(self)
-
-        self.sprite = sf.RectangleShape()
+        small_monster = sf.Texture.from_file("small_monster.png")
+        self.sprite = sf.Sprite(small_monster)
+        '''self.sprite = sf.RectangleShape()
         self.sprite.size = (5, 5)
         self.sprite.fill_color = sf.Color.BLUE
-        self.sprite.position = (x, y)
+        self.sprite.position = (x, y)'''
 
         self.speed = 2
         self.damage = 1
+
+        
+        
