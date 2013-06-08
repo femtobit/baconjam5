@@ -6,19 +6,12 @@ import sys
 import sfml as sf
 
 from actors import *
+from constants import *
 from helpers import *
 
 WIDTH = 640
 HEIGHT = 480
 
-MAP_WIDTH = 960
-MAP_HEIGHT = 1280
-
-PERIOD_OF_TIME = 0
-COUGHT_A_BUS = False
-busses = []
-creatures = []
-COLLIDE = False
 BUS_IMAGE = sf.Image.from_file("bus.png")
 # create the main window
 window = sf.RenderWindow(sf.VideoMode(WIDTH, HEIGHT), "pySFML Window")
@@ -30,17 +23,6 @@ def end_game():
     creatures = []
     PERIOD_OF_TIME = 0
     window.close()
-
-class Creature(Actor):
-    def __init__(self):
-        Actor.__init__(self)
-        self.sprite = sf.RectangleShape()
-        self.sprite.size = (5, 5)
-        self.sprite.fill_color = sf.Color.BLUE
-        self.sprite.position = (random.randrange(0, MAP_WIDTH), random.randrange(0, MAP_HEIGHT))
-
-    def draw(self, target, states):
-        target.draw(self.sprite, states)
 
 class Overlay(sf.Drawable):
     def __init__(self, actor):
@@ -65,7 +47,8 @@ def main():
     player = Player(WIDTH / 2, HEIGHT / 2, 5)
     
     for i in range (0, 20):
-        creature = Creature()
+        creature = Grue(random.randrange(0, MAP_WIDTH),
+                random.randrange(0, MAP_HEIGHT))
         creatures.append(creature)
 
     background = sf.Sprite(sf.Texture.from_file("map2.png"))
@@ -141,7 +124,7 @@ def main():
             view_delta += (0, delta.y)
 
         debug.append("dr: %s" % delta)
-        player.move(delta.x, delta.y)
+        player.move(delta)
         view.move(view_delta.x, view_delta.y)    
 
         debug.append("Pos: %s" % player.sprite.position)
@@ -159,16 +142,7 @@ def main():
         #Monster movement
         if timer2.elapsed_time >= sf.milliseconds(50):
             for c in creatures:
-                step = sf.Vector2(random.randrange(-1, 1), random.randrange(-1, 1))
-                if step.x == -1 and c.sprite.position.x > 0:
-                    c.move(step.x, 0)
-                if step.x == 1 and c.sprite.position.x < MAP_WIDTH:
-                    c.move(step.x, 0)
-                if step.y == -1 and c.sprite.position.y > 0:
-                    c.move(0, step.y)
-                if step.y == 1 and c.sprite.positiony < MAP_HEIGHT:
-                    c.move(0, step.y)
-
+                creature.step()
             timer2.restart()
              
         window.clear()

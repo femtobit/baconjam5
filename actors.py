@@ -11,8 +11,8 @@ class Actor(sf.Drawable):
 
         self.sprite = sf.CircleShape()
 
-    def move(self, dx, dy):
-        self.position += (dx, dy)
+    def move(self, dr):
+        self.sprite.position += dr
 
     def draw(self, target, states):
         target.draw(self.sprite, states)
@@ -30,7 +30,7 @@ class Actor(sf.Drawable):
                       <= collision_radius(self) + collision_radius(object) - 3
 
 class Player(Actor):
-    def __init__(self, x, y, health):
+    def __init__(self, x, y):
         Actor.__init__(self)
 
         self.sprite = sf.RectangleShape()
@@ -52,7 +52,7 @@ class Bus(Actor):
         self.sprite.size = (50, 50)
         self.sprite.outline_color = sf.Color.BLUE
         self.sprite.outline_thickness = 2
-        self.sprite.position = (x, y)
+        self.position = (x, y)
         
     def draw(self, target, states):
         target.draw(self.sprite, states)
@@ -66,14 +66,22 @@ class Bus(Actor):
 
 class Monster(Actor):
     def __init__(self):
+        Actor.__init__(self)
         self.speed = 1
         self.damage = 5
+
+    def step(self):
+        while True:
+            step = sf.Vector2(random.randrange(-1, 1), random.randrange(-1, 1))
+            if MAP_RECT.contains(self.position + step):
+                break
+        self.move(step)
 
     def hunt_player(self, player):
         player_direction = player.position - self.position
         delta = (player_direction / vector.norm(player_direction)) * self.speed
 
-        self.move(delta.x, delta.y)
+        self.move(delta)
 
     def bite(self, player):
         if self.collides_with(player):
