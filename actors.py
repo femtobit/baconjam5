@@ -4,8 +4,10 @@ class Actor(sf.Drawable):
     def __init__(self):
         sf.Drawable.__init__(self)
 
+        self.sprite = sf.Sprite()
+
     def move(self, dx, dy):
-        self.position += (dx, dy) * self.velocity
+        self.position += (dx, dy)
 
     def draw(self, target, states):
         target.draw(self.sprite, states)

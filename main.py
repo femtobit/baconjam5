@@ -55,9 +55,9 @@ def main():
     PERIOD_OF_TIME = 0
     CAUGHT_A_BUS = False
     busses = []
-   
+
     window = sf.RenderWindow(sf.VideoMode(WIDTH, HEIGHT), "A Walk In The Dark")
-            
+
     player = Player(WIDTH / 2, HEIGHT / 2)
 
     background = sf.Sprite(sf.Texture.from_file("map1.png"))
@@ -71,53 +71,63 @@ def main():
     timer = sf.Clock()
 
     while window.is_open:
-        debug_text = ""
+        debug = []
 
         if timer.elapsed_time >= sf.seconds(15):
             PERIOD_OF_TIME += 1
             timer.restart()
-            print("Period: " + str(PERIOD_OF_TIME))
             bus = Bus(PERIOD_OF_TIME)
             print("Bus's numbers are: " + str(bus.get_number()))
             busses.append(bus)
-            
+
         for event in window.events:
             if type(event) is sf.CloseEvent:
                 window.close()
                 sys.exit(0)
 
+        debug.append("Pos: %s" % player.position)
+        debug.append("Period: %i" % PERIOD_OF_TIME)
+
         delta = sf.Vector2()
-        if sf.Keyboard.is_key_pressed(sf.Keyboard.LEFT) and player.sprite.position.x > 0:
+        if sf.Keyboard.is_key_pressed(sf.Keyboard.LEFT) \
+                and player.sprite.position.x > 0:
             delta += (-1,0)
-        elif sf.Keyboard.is_key_pressed(sf.Keyboard.RIGHT) and player.sprite.position.x + player.sprite.size.x < MAP_WIDTH:
+        elif sf.Keyboard.is_key_pressed(sf.Keyboard.RIGHT) \
+                and player.sprite.position.x + player.sprite.size.x < MAP_WIDTH:
             delta += (1,0)
-        if sf.Keyboard.is_key_pressed(sf.Keyboard.UP) and player.sprite.position.y > 0:
+        if sf.Keyboard.is_key_pressed(sf.Keyboard.UP) \
+                and player.sprite.position.y > 0:
             delta += (0,-1)
-        elif sf.Keyboard.is_key_pressed(sf.Keyboard.DOWN) and player.sprite.position.y + player.sprite.size.y < MAP_HEIGHT:
+        elif sf.Keyboard.is_key_pressed(sf.Keyboard.DOWN) \
+                and player.sprite.position.y + player.sprite.size.y < MAP_HEIGHT:
             delta += (0,1)
-            
+
         elif sf.Keyboard.is_key_pressed(sf.Keyboard.ESCAPE):
             window.close()
 
         if sf.Keyboard.is_key_pressed(sf.Keyboard.L_SHIFT):
-            debug_text += ", sprint"
-            player.velocity = 8
+            debug.append("sprint")
+            delta *= 8
         else:
-            player.velocity = 2
-        
+            delta *= 2
         view_delta = sf.Vector2()
-        if player.sprite.position.x > WIDTH / 2 and player.sprite.position.x < MAP_WIDTH - WIDTH / 2:
+        if player.sprite.position.x > WIDTH / 2 \
+                and player.sprite.position.x < MAP_WIDTH - WIDTH / 2:
             view_delta += (delta.x, 0)
-        if player.sprite.position.y > HEIGHT / 2 and player.sprite.position.y < MAP_HEIGHT - HEIGHT / 2:
+        if player.sprite.position.y > HEIGHT / 2 \
+                and player.sprite.position.y < MAP_HEIGHT - HEIGHT / 2:
             view_delta += (0, delta.y)
 
-        print(delta, player.velocity)
+        debug.append("dr: %s" % delta)
         player.move(delta.x, delta.y)
         view.move(view_delta.x, view_delta.y)    
 
-        for bus in busses:
-            bus.move()  
+        debug.append("Pos: %s" % player.sprite.position)
+        debug.append("Period: %i" % PERIOD_OF_TIME)
 
+
+        for bus in busses:
+            bus.move()
 
         window.clear() # clear screen
         window.draw(background)
@@ -127,12 +137,11 @@ def main():
         window.draw(overlay)
 
         window.view = window.default_view
-        debug_text_full = sf.Text("Pos: %s, Period: %i%s"
-                % (player.sprite.position, PERIOD_OF_TIME, debug_text))
-        debug_text_full.color = sf.Color.RED
-        debug_text_full.position = (0, HEIGHT - 20)
-        debug_text_full.character_size = 12
-        window.draw(debug_text_full)
+        debug_text = sf.Text(", ".join(debug))
+        debug_text.color = sf.Color.RED
+        debug_text.position = (0, HEIGHT - 20)
+        debug_text.character_size = 12
+        window.draw(debug_text)
 
 
         window.display()
