@@ -3,7 +3,7 @@ import sfml as sf
 
 WIDTH = 640
 HEIGHT = 480
-
+PERIOD_OF_TIME = 0
 # create the main window
 window = sf.RenderWindow(sf.VideoMode(WIDTH, HEIGHT), "pySFML Window")
 
@@ -19,29 +19,39 @@ class Actor(sf.Drawable):
 
     def draw(self, target, states):
         target.draw(self.sprite, states)
-
 player = Actor()
+
+class Bus():
+    def __init__(self):
+        pass
+
+    def get_number(self):
+        pass
+
+
 
 # start the game loop
 while window.is_open:
 # process events
     for event in window.events:
         if type(event) is sf.CloseEvent:
+            
             window.close()
 
-    if sf.Keyboard.is_key_pressed(sf.Keyboard.LEFT):
+    if sf.Keyboard.is_key_pressed(sf.Keyboard.LEFT) and player.sprite.position.x > 0:
         player.sprite.position += (-1,0)
-    elif sf.Keyboard.is_key_pressed(sf.Keyboard.RIGHT):
+    elif sf.Keyboard.is_key_pressed(sf.Keyboard.RIGHT) and player.sprite.position.x > WIDTH:
         player.sprite.position += (1,0)
 
-    if sf.Keyboard.is_key_pressed(sf.Keyboard.UP):
+    if sf.Keyboard.is_key_pressed(sf.Keyboard.UP) and player.sprite.position.y > 0:
         player.sprite.position += (0,-1)
-    elif sf.Keyboard.is_key_pressed(sf.Keyboard.DOWN):
+    elif sf.Keyboard.is_key_pressed(sf.Keyboard.DOWN) and player.sprite.position.y > HEIGHT:
         player.sprite.position += (0,1)
         
     elif sf.Keyboard.is_key_pressed(sf.Keyboard.ESCAPE):
         window.close()
-            
+    
+
     window.clear() # clear screen
     window.draw(player) # draw the sprite
     window.display() # update the window
