@@ -1,5 +1,8 @@
+import random
+
 import sfml as sf
 
+from constants import *
 from helpers import *
 
 class Actor(sf.Drawable):
@@ -61,7 +64,7 @@ class Bus(Actor):
     def get_number(self):
         return self.start_number
 
-def Monster(Actor):
+class Monster(Actor):
     def __init__(self):
         self.speed = 1
         self.damage = 5
@@ -77,17 +80,17 @@ def Monster(Actor):
             player.health -= self.damage
             if player.health <= 0:
                 window.close()
-    
-            
 
-def Grue(Monster):
+class Grue(Monster):
     def __init__(self, x, y):
         Monster.__init__(self)
 
-        self.sprite = sf.CircleShape()
-        self.sprite.size = (30,30)
-        self.sprite.color = sf.Color.GREEN
-        self.position = (x,y)
+        self.sprite = sf.RectangleShape()
+        self.sprite.size = (5, 5)
+        self.sprite.fill_color = sf.Color.BLUE
+        self.sprite.position = (x, y)
+
+        self.speed = 0.5
 
         self.speed = 1.5
         self.damage = 1
