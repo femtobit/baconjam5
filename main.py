@@ -41,6 +41,7 @@ def main():
     PERIOD_OF_TIME = 0
     CAUGHT_A_BUS = False
     busses = []
+    creatures = []
 
     window = sf.RenderWindow(sf.VideoMode(WIDTH, HEIGHT), "A Walk In The Dark")
 
