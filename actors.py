@@ -4,7 +4,6 @@ import sfml as sf
 
 from constants import *
 from helpers import *
-import vector
 
 class Actor(sf.Drawable):
     def __init__(self):
@@ -12,10 +11,10 @@ class Actor(sf.Drawable):
 
         self.sprite = sf.CircleShape()
 
-    def move(self, dr):
+    def move(self, dr, dt):
         #print("Move actor by %s" % str(dr))
         #print(self.sprite.position)
-        self.sprite.position += dr
+        self.sprite.position += dr * dt
         #print(self.sprite.position)
 
     def draw(self, target, states):
@@ -77,13 +76,13 @@ class Monster(Actor):
         self.direction = random_unit_vector()
         self.direction_timer = sf.Clock()
 
-    def step(self):
+    def step(self, dt):
         if self.direction_timer.elapsed_time > sf.seconds(5) \
                 or not MAP_RECT.contains(self.position + (self.direction * self.speed * 10)):
             self.direction = random_unit_vector()
             self.direction_timer.restart()
 
-        self.move(self.direction * self.speed)
+        self.move(self.direction * self.speed, dt)
 
     def hunt_player(self, player):
         player_direction = player.position - self.position
