@@ -54,7 +54,7 @@ class Bus(Actor):
         self.sprite = sf.RectangleShape()
         self.sprite.size = (50, 50)
         self.sprite.outline_color = sf.Color.BLUE
-        slef.sprite.outline_thickness = 2
+        self.sprite.outline_thickness = 2
         self.sprite.position = (342, 100)
 
     def draw(self, target, states):
@@ -72,7 +72,19 @@ class Bus(Actor):
     def dessapear(self):
         busses.pop(len(0))
 
-        
+class Overlay(sf.Drawable):
+    def __init__(self, view):
+        self.view = view
+
+        texture = sf.Texture.from_file("overlay.png")
+        self.sprite = sf.Sprite(texture)
+
+    def draw(self, target, states):
+        self.sprite.position = \
+            self.view.center - (WIDTH/2, HEIGHT/2)
+        target.draw(self.sprite)
+
+busses = []
 
 background_texture = sf.Texture.from_file("map1.png")
 background = sf.Sprite(background_texture)
@@ -80,6 +92,7 @@ background = sf.Sprite(background_texture)
 view = sf.View()
 view.reset(sf.Rectangle((0, 0), (WIDTH, HEIGHT)))
 window.view = view
+overlay = Overlay(view)
 
 timer = sf.Clock()
 # start the game loop
@@ -100,6 +113,7 @@ while window.is_open:
             busses = []
             window.close()
 
+    delta = sf.Vector2()
     if sf.Keyboard.is_key_pressed(sf.Keyboard.LEFT) and player.sprite.position.x > 0:
         delta += (-1,0)
     elif sf.Keyboard.is_key_pressed(sf.Keyboard.RIGHT) and player.sprite.position.x + player.sprite.size.x < MAP_WIDTH:
@@ -124,22 +138,13 @@ while window.is_open:
         view_delta += (0, delta.y)
 
     print(delta)
-    player.move(delta)
-    view.move(view_delta.x * player.velocity, view_delta.y * player.velocity)
-    
-    view_delta = sf.Vector2()
-    if player.sprite.position.x > WIDTH / 2 and player.sprite.position.x < MAP_WIDTH - WIDTH / 2:
-        view_delta += (delta.x, 0)
-    if player.sprite.position.y > HEIGHT / 2 and player.sprite.position.y < MAP_HEIGHT - HEIGHT / 2:
-        view_delta += (0, delta.y)
-
-    print(delta)
-    player.move(delta)
+    player.move(delta.x, delta.y)
     view.move(view_delta.x * player.velocity, view_delta.y * player.velocity)    
 
     window.clear() # clear screen
     window.draw(background)
     window.draw(player) # draw the sprite
+    window.draw(overlay)
     for bus in busses:
         window.draw(bus)
     window.display() # update the window
