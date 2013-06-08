@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+#-*- encoding: utf-8 -*-
 import datetime
 import math
 import random
@@ -57,20 +58,16 @@ def main():
 
     overlay = Overlay(player)
 
-    timer = sf.Clock()
-    timer2 = sf.Clock()
+    step_timer = sf.Clock()
 
     while window.is_open:
         debug = []
 
-        if timer.elapsed_time >= sf.seconds(15):
-            PERIOD_OF_TIME += 1
-            timer.restart()
-            '''bus = Bus(PERIOD_OF_TIME)
-            busses.append(bus)'''
-
+        dt = step_timer.elapsed_time.milliseconds / 16.0
+        step_timer.restart()
+        debug.append("(dt=%i/16 ms)" % dt) 
+        
         for c in creatures:
-            debug.append("Grues: ")
             if c.collides_with(player):
                 print("You were eaten, sorry(((")
                 window.close()
@@ -123,8 +120,8 @@ def main():
             view_delta += (0, delta.y)
 
         debug.append("dr: %s" % delta)
-        player.move(delta)
-        view.move(view_delta.x, view_delta.y)    
+        player.move(delta, dt)
+        view.move(view_delta.x * dt, view_delta.y * dt)
 
         debug.append("Pos: %s" % player.sprite.position)
         debug.append("Period: %i" % PERIOD_OF_TIME)
@@ -140,7 +137,7 @@ def main():
 
         #Monster movement
         for creature in creatures:
-            creature.step()
+            creature.step(dt)
              
         window.clear()
         window.draw(background)
@@ -157,7 +154,6 @@ def main():
         debug_text.position = (0, HEIGHT - 20)
         debug_text.character_size = 12
         window.draw(debug_text)
-
 
         window.display()
 
