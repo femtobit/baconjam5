@@ -14,12 +14,24 @@ COUGHT_A_BUS = False
 busses = []
 creatures = []
 COLLIDE = False
+BUS_IMAGE = sf.Image.from_file("bus.png")
 # create the main window
 window = sf.RenderWindow(sf.VideoMode(WIDTH, HEIGHT), "pySFML Window")
 
 #helper functions
 def dist(p,q):
     return math.sqrt((p[0]-q[0])**2+(p[1]-q[1])**2)
+
+def radius_for_collision(object):
+    return object.sprite.size.x / 2
+
+def end_game():
+    timer.restart()
+    timer2.restart()
+    busses = []
+    creatures = []
+    PERIOD_OF_TIME = 0
+    window.close()
 
 class Actor(sf.Drawable):
     def __init__(self):
@@ -33,7 +45,7 @@ class Actor(sf.Drawable):
     def draw(self, target, states):
         target.draw(self.sprite, states)
     def is_collide(self, object):
-        if dist(self.sprite.position, object.sprite.position)<= self.sprite.size.x + object.sprite.size.x:
+        if dist(self.sprite.position, object.sprite.position)<= radius_for_collision(self) + radius_for_collision(object)-3:
             COLLIDE = True
         else:
             COLLIDE = False
@@ -52,19 +64,20 @@ class Player(Actor):
         target.draw(self.sprite, states)
 
     def got_bus(self, Bus):
-        COUGHT_A_BUS = True
+        return COUGHT_A_BUS 
         
 player = Player()
 
 class Bus(Actor):
     def __init__(self, start_number):
         Actor.__init__(self)
+            
         self.sprite = sf.RectangleShape()
         self.sprite.size = (50, 50)
         self.sprite.outline_color = sf.Color.BLUE
         self.sprite.outline_thickness = 2
         self.sprite.position = (342, MAP_HEIGHT)
-    
+        
     def draw(self, target, states):
         target.draw(self.sprite)
 
@@ -109,6 +122,7 @@ window.view = view
 overlay = Overlay(player)
 
 timer = sf.Clock()
+timer2 = sf.Clock()
 # start the game loop
 while window.is_open:
     if timer.elapsed_time >= sf.seconds(10):
@@ -118,16 +132,22 @@ while window.is_open:
         busses.append(bus)
     for c in creatures:
         if c.is_collide(player):
-            window.close()
             print("You were eaten, sorry(((")
+            end_game()
+    for b in busses:
+        if b.is_collide(player):
+            print("You were knpcked down by the bus, sorry(((")
+            end_game()
+    for c in creatures:
+        for b in busses:
+            if b.is_collide(c):
+                creatures.remove(c)
+        
     
 # process events
     for event in window.events:
         if type(event) is sf.CloseEvent:
-            timer.restart()
-            PERIOD_OF_TIME = 0
-            busses = []
-            window.close()
+            end_game()
 
     delta = sf.Vector2()
     if sf.Keyboard.is_key_pressed(sf.Keyboard.LEFT) and player.sprite.position.x > 0:
@@ -162,11 +182,23 @@ while window.is_open:
             bus.move(0, -1)
         else:
             busses.remove(bus)
-    if timer.elapsed_time >= sf.seconds(3):
-        step = sf.Vector2(random.randrange(-1, 1), random.randrange(-1, 1))
+        
+    if timer2.elapsed_time >= sf.milliseconds(50):
         for c in creatures:
-            c.move(step.x, step.y)
-            
+            step = sf.Vector2(random.randrange(-1, 1), random.randrange(-1, 1))
+            if step.x == -1 and c.sprite.position.x > 0:
+                c.move(step.x, 0)
+            if step.x == 1 and c.sprite.position.x < MAP_WIDTH:
+                c.move(step.x, 0)
+            if step.y == -1 and c.sprite.position.y > 0:
+                c.move(0, step.y)
+            if step.y == 1 and c.sprite.positiony < MAP_HEIGHT:
+                c.move(0, step.y)
+            else:
+                print("nope,waiting")
+                
+        timer2.restart()
+           
     window.clear() # clear screen
     window.draw(background)
     window.draw(player) # draw the sprite
@@ -175,7 +207,6 @@ while window.is_open:
     for creature in creatures:
         window.draw(creature)
     window.draw(overlay)
-
     window.view = window.default_view
     debug_text = sf.Text("Pos: %s, Period: %i" % (player.sprite.position, PERIOD_OF_TIME))
     debug_text.color = sf.Color.RED
