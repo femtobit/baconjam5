@@ -97,6 +97,8 @@ overlay = Overlay(player)
 timer = sf.Clock()
 # start the game loop
 while window.is_open:
+    debug_text = ""
+
     if timer.elapsed_time >= sf.seconds(15):
         PERIOD_OF_TIME += 1
         timer.restart()
@@ -127,6 +129,7 @@ while window.is_open:
         window.close()
 
     if sf.Keyboard.is_key_pressed(sf.Keyboard.L_SHIFT):
+        debug_text += ", sprint"
         player.velocity = 8
     else:
         player.velocity = 2
@@ -137,7 +140,7 @@ while window.is_open:
     if player.sprite.position.y > HEIGHT / 2 and player.sprite.position.y < MAP_HEIGHT - HEIGHT / 2:
         view_delta += (0, delta.y)
 
-    print(delta)
+    print(delta, player.velocity)
     player.move(delta.x, delta.y)
     view.move(view_delta.x, view_delta.y)    
 
@@ -149,11 +152,12 @@ while window.is_open:
     window.draw(overlay)
 
     window.view = window.default_view
-    debug_text = sf.Text("Pos: %s, Period: %i" % (player.sprite.position, PERIOD_OF_TIME))
-    debug_text.color = sf.Color.RED
-    debug_text.position = (0, HEIGHT - 20)
-    debug_text.character_size = 12
-    window.draw(debug_text)
+    debug_text_full = sf.Text("Pos: %s, Period: %i%s"
+            % (player.sprite.position, PERIOD_OF_TIME, debug_text))
+    debug_text_full.color = sf.Color.RED
+    debug_text_full.position = (0, HEIGHT - 20)
+    debug_text_full.character_size = 12
+    window.draw(debug_text_full)
 
 
     window.display() # update the window
