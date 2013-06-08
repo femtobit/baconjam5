@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 import sfml as sf
-
+import random
+import math
 
 WIDTH = 640
 HEIGHT = 480
@@ -11,8 +12,14 @@ MAP_HEIGHT = 1280
 PERIOD_OF_TIME = 0
 COUGHT_A_BUS = False
 busses = []
+creatures = []
+COLLIDE = False
 # create the main window
 window = sf.RenderWindow(sf.VideoMode(WIDTH, HEIGHT), "pySFML Window")
+
+#helper functions
+def dist(p,q):
+    return math.sqrt((p[0]-q[0])**2+(p[1]-q[1])**2)
 
 class Actor(sf.Drawable):
     def __init__(self):
@@ -25,6 +32,12 @@ class Actor(sf.Drawable):
 
     def draw(self, target, states):
         target.draw(self.sprite, states)
+    def is_collide(self, object):
+        if dist(self.sprite.position, object.sprite.position)<= self.sprite.size.x + object.sprite.size.x:
+            COLLIDE = True
+        else:
+            COLLIDE = False
+        return COLLIDE
 
 class Player(Actor):
     def __init__(self):
@@ -46,30 +59,33 @@ player = Player()
 class Bus(Actor):
     def __init__(self, start_number):
         Actor.__init__(self)
-
-        self.start_number = PERIOD_OF_TIME
-
         self.sprite = sf.RectangleShape()
         self.sprite.size = (50, 50)
         self.sprite.outline_color = sf.Color.BLUE
         self.sprite.outline_thickness = 2
-        self.sprite.position = (342, 100)
-
+        self.sprite.position = (342, MAP_HEIGHT)
+    
     def draw(self, target, states):
-        target.draw(self.sprite, states)
-
-    def bus_move(self):
-        if (self.position.x > 342 and self.position.y > 0):
-            self.move(0, 1)
-        else:
-            self.dissapear()
+        target.draw(self.sprite)
 
     def get_number(self):
         return self.start_number
 
-    def dessapear(self):
-        busses.pop(len(0))
-
+class Creature(Actor):
+    def __init__(self):
+        Actor.__init__(self)
+        self.sprite = sf.RectangleShape()
+        self.sprite.size = (5, 5)
+        self.sprite.fill_color = sf.Color.BLUE
+        self.sprite.position = (random.randrange(0, MAP_WIDTH), random.randrange(0, MAP_HEIGHT))
+    def draw(self, target, states):
+        target.draw(self.sprite)
+    
+    
+for i in range (0, 20):
+        creature = Creature()
+        creatures.append(creature)
+    
 class Overlay(sf.Drawable):
     def __init__(self, actor):
         self.actor = actor
@@ -95,14 +111,16 @@ overlay = Overlay(player)
 timer = sf.Clock()
 # start the game loop
 while window.is_open:
-    if timer.elapsed_time >= sf.seconds(15):
+    if timer.elapsed_time >= sf.seconds(10):
         PERIOD_OF_TIME += 1
         timer.restart()
-        print("Period: " + str(PERIOD_OF_TIME))
         bus = Bus(PERIOD_OF_TIME)
-        print("Bus's numbers are: " + str(bus.get_number()))
         busses.append(bus)
-        
+    for c in creatures:
+        if c.is_collide(player):
+            window.close()
+            print("You were eaten, sorry(((")
+    
 # process events
     for event in window.events:
         if type(event) is sf.CloseEvent:
@@ -127,7 +145,7 @@ while window.is_open:
     if sf.Keyboard.is_key_pressed(sf.Keyboard.L_SHIFT):
         player.velocity = 8
     else:
-        player.velocity = 2
+        player.velocity = 1
     
     view_delta = sf.Vector2()
     if player.sprite.position.x > WIDTH / 2 and player.sprite.position.x < MAP_WIDTH - WIDTH / 2:
@@ -135,19 +153,27 @@ while window.is_open:
     if player.sprite.position.y > HEIGHT / 2 and player.sprite.position.y < MAP_HEIGHT - HEIGHT / 2:
         view_delta += (0, delta.y)
 
-    print(delta)
+    #print(delta)
     player.move(delta.x, delta.y)
     view.move(view_delta.x, view_delta.y)    
 
     for bus in busses:
-        bus.bus_move()  
-
-
+        if bus.sprite.position.y > 0:
+            bus.move(0, -1)
+        else:
+            busses.remove(bus)
+    if timer.elapsed_time >= sf.seconds(3):
+        step = sf.Vector2(random.randrange(-1, 1), random.randrange(-1, 1))
+        for c in creatures:
+            c.move(step.x, step.y)
+            
     window.clear() # clear screen
     window.draw(background)
     window.draw(player) # draw the sprite
     for bus in busses:
         window.draw(bus)
+    for creature in creatures:
+        window.draw(creature)
     window.draw(overlay)
 
     window.view = window.default_view
