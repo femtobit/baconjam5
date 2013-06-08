@@ -110,8 +110,8 @@ class Grue(Monster):
         self.sprite = sf.Sprite(small_monster)
         '''self.sprite = sf.RectangleShape()
         self.sprite.size = (5, 5)
-        self.sprite.fill_color = sf.Color.BLUE
-        self.sprite.position = (x, y)'''
+        self.sprite.fill_color = sf.Color.BLUE'''
+        self.sprite.position = (x, y)
 
         self.speed = 2
         self.damage = 1
