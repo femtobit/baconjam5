@@ -14,7 +14,22 @@ HEIGHT = 480
 MAP_WIDTH = 960
 MAP_HEIGHT = 1280
 
+PERIOD_OF_TIME = 0
+COUGHT_A_BUS = False
+busses = []
+creatures = []
+COLLIDE = False
 BUS_IMAGE = sf.Image.from_file("bus.png")
+# create the main window
+window = sf.RenderWindow(sf.VideoMode(WIDTH, HEIGHT), "pySFML Window")
+
+def end_game():
+    timer.restart()
+    timer2.restart()
+    busses = []
+    creatures = []
+    PERIOD_OF_TIME = 0
+    window.close()
 
 class Creature(Actor):
     def __init__(self):
@@ -41,22 +56,19 @@ class Overlay(sf.Drawable):
         target.draw(self.sprite)
 
 def main():
-    bus_period = 0
-    player_caught_bus = True
+    PERIOD_OF_TIME = 0
+    CAUGHT_A_BUS = False
     busses = []
-    creatures = []
+
     window = sf.RenderWindow(sf.VideoMode(WIDTH, HEIGHT), "A Walk In The Dark")
 
-    def end_game():
-        window.close()
-
-    player = Player(WIDTH / 2, HEIGHT / 2)
+    player = Player(WIDTH / 2, HEIGHT / 2, 5)
     
     for i in range (0, 20):
         creature = Creature()
         creatures.append(creature)
 
-    background = sf.Sprite(sf.Texture.from_file("map1.png"))
+    background = sf.Sprite(sf.Texture.from_file("map2.png"))
 
     view = sf.View()
     view.reset(sf.Rectangle((0, 0), (WIDTH, HEIGHT)))
@@ -71,32 +83,32 @@ def main():
         debug = []
 
         if timer.elapsed_time >= sf.seconds(15):
-            bus_period += 1
+            PERIOD_OF_TIME += 1
             timer.restart()
-            bus = Bus(342, MAP_HEIGHT, bus_period)
-            busses.append(bus)
+            '''bus = Bus(PERIOD_OF_TIME)
+            busses.append(bus)'''
 
         for c in creatures:
             if c.collides_with(player):
                 print("You were eaten, sorry(((")
-                end_game()
+                window.close()
 
-        for b in busses:
+        '''for b in busses:
             if b.collides_with(player):
                 print("You were knocked down by the bus, sorry(((")
-                end_game()
+                window.close()
 
         for c in creatures:
             for b in busses:
                 if b.collides_with(c):
-                    creatures.remove(c)
+                    creatures.remove(c)'''
 
         for event in window.events:
             if type(event) is sf.CloseEvent:
-                end_game()
+                window.close()
 
         debug.append("Pos: %s" % player.position)
-        debug.append("Period: %i" % bus_period)
+        debug.append("Period: %i" % PERIOD_OF_TIME)
 
         delta = sf.Vector2()
         if sf.Keyboard.is_key_pressed(sf.Keyboard.LEFT) \
@@ -120,7 +132,6 @@ def main():
             delta *= 8
         else:
             delta *= 2
-
         view_delta = sf.Vector2()
         if player.sprite.position.x > WIDTH / 2 \
                 and player.sprite.position.x < MAP_WIDTH - WIDTH / 2:
@@ -134,14 +145,16 @@ def main():
         view.move(view_delta.x, view_delta.y)    
 
         debug.append("Pos: %s" % player.sprite.position)
-        debug.append("Period: %i" % bus_period)
+        debug.append("Period: %i" % PERIOD_OF_TIME)
 
 
-        for bus in busses:
+        '''for bus in busses:
             if bus.sprite.position.y > 0:
-                bus.move()
+                bus.move(0, -1)
             else:
-                busses.remove(bus)                
+                busses.remove(bus)
+            for bus in busses:
+                bus.move()'''
 
         #Monster movement
         if timer2.elapsed_time >= sf.milliseconds(50):
@@ -168,12 +181,12 @@ def main():
         window.draw(overlay)
 
         window.view = window.default_view
-
         debug_text = sf.Text(", ".join(debug))
         debug_text.color = sf.Color.RED
         debug_text.position = (0, HEIGHT - 20)
         debug_text.character_size = 12
         window.draw(debug_text)
+
 
         window.display()
 
