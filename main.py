@@ -30,8 +30,7 @@ class Player(Actor):
 
         self.sprite = sf.RectangleShape()
         self.sprite.size = (30, 30)
-        self.sprite.outline_color = sf.Color.RED
-        self.sprite.outline_thickness = 5
+        self.sprite.fill_color = sf.Color.RED
         self.sprite.position = (WIDTH / 2, HEIGHT / 2)
 
     def draw(self, target, states):
@@ -85,12 +84,11 @@ while window.is_open:
     delta = sf.Vector2()
     if sf.Keyboard.is_key_pressed(sf.Keyboard.LEFT) and player.sprite.position.x > 0:
         delta += (-1,0)
-    elif sf.Keyboard.is_key_pressed(sf.Keyboard.RIGHT) and player.sprite.position.x < MAP_WIDTH:
+    elif sf.Keyboard.is_key_pressed(sf.Keyboard.RIGHT) and player.sprite.position.x + player.sprite.size.x < MAP_WIDTH:
         delta += (1,0)
-        
     if sf.Keyboard.is_key_pressed(sf.Keyboard.UP) and player.sprite.position.y > 0:
         delta += (0,-1)
-    elif sf.Keyboard.is_key_pressed(sf.Keyboard.DOWN) and player.sprite.position.y < MAP_HEIGHT:
+    elif sf.Keyboard.is_key_pressed(sf.Keyboard.DOWN) and player.sprite.position.y + player.sprite.size.y < MAP_HEIGHT:
         delta += (0,1)
         
     elif sf.Keyboard.is_key_pressed(sf.Keyboard.ESCAPE):
@@ -100,10 +98,16 @@ while window.is_open:
         player.velocity = 8
     else:
         player.velocity = 2
+    
+    view_delta = sf.Vector2()
+    if player.sprite.position.x > WIDTH / 2 and player.sprite.position.x < MAP_WIDTH - WIDTH / 2:
+        view_delta += (delta.x, 0)
+    if player.sprite.position.y > HEIGHT / 2 and player.sprite.position.y < MAP_HEIGHT - HEIGHT / 2:
+        view_delta += (0, delta.y)
 
     print(delta)
     player.move(delta)
-    view.move(delta.x * player.velocity, delta.y * player.velocity)
+    view.move(view_delta.x * player.velocity, view_delta.y * player.velocity)
     
     window.view = view
 
