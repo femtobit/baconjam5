@@ -41,9 +41,7 @@ class Player(Actor):
     def got_bus(self, Bus):
         COUGHT_A_BUS = True
         
-
 player = Player()
-
 
 class Bus(Actor):
     def __init__(self, start_number):
@@ -62,7 +60,7 @@ class Bus(Actor):
 
     def bus_move(self):
         if (self.position.x > 342 and self.position.y > 0):
-            self.move(self.position.x, self.position.y)
+            self.move(0, 1)
         else:
             self.dissapear()
 
@@ -140,6 +138,10 @@ while window.is_open:
     print(delta)
     player.move(delta.x, delta.y)
     view.move(view_delta.x, view_delta.y)    
+
+    for bus in busses:
+        bus.bus_move()  
+
 
     window.clear() # clear screen
     window.draw(background)
