@@ -1,0 +1,61 @@
+import sfml as sf
+
+from helpers import *
+
+class Actor(sf.Drawable):
+    def __init__(self):
+        sf.Drawable.__init__(self)
+
+        self.sprite = sf.CircleShape()
+
+    def move(self, dx, dy):
+        self.position += (dx, dy)
+
+    def draw(self, target, states):
+        target.draw(self.sprite, states)
+
+    @property
+    def position(self):
+        return self.sprite.position
+
+    @position.setter
+    def position(self, pos):
+        self.sprite.position = pos
+
+    def collides_with(self, object):
+        return dist(self.sprite.position, object.sprite.position) \
+                      <= collision_radius(self) + collision_radius(object) - 3
+
+class Player(Actor):
+    def __init__(self, x, y):
+        Actor.__init__(self)
+
+        self.sprite = sf.RectangleShape()
+        self.sprite.size = (30, 30)
+        self.sprite.fill_color = sf.Color.RED
+        self.position = (x, y)
+
+    def draw(self, target, states):
+        target.draw(self.sprite, states)
+
+class Bus(Actor):
+    def __init__(self, x, y, start_number):
+        Actor.__init__(self)
+
+        self.start_number = start_number
+
+        self.sprite = sf.RectangleShape()
+        self.sprite.size = (50, 50)
+        self.sprite.outline_color = sf.Color.BLUE
+        self.sprite.outline_thickness = 2
+        self.sprite.position = (x, y)
+        
+    def draw(self, target, states):
+        target.draw(self.sprite, states)
+
+    def move(self):
+        if (self.position.x > 342 and self.position.y > 0):
+            super(self, Bus).move(0, 1)
+
+    def get_number(self):
+        return self.start_number
