@@ -5,8 +5,8 @@ import sfml as sf
 WIDTH = 640
 HEIGHT = 480
 
-MAP_WIDTH = WIDTH * 4
-MAP_HEIGHT = HEIGHT * 4
+MAP_WIDTH = 960
+MAP_HEIGHT = 1280
 
 PERIOD_OF_TIME = 0
 COUGHT_A_BUS = False
@@ -32,8 +32,7 @@ class Player(Actor):
 
         self.sprite = sf.RectangleShape()
         self.sprite.size = (30, 30)
-        self.sprite.outline_color = sf.Color.RED
-        self.sprite.outline_thickness = 5
+        self.sprite.fill_color = sf.Color.RED
         self.sprite.position = (WIDTH / 2, HEIGHT / 2)
 
     def draw(self, target, states):
@@ -102,18 +101,41 @@ while window.is_open:
             window.close()
 
     if sf.Keyboard.is_key_pressed(sf.Keyboard.LEFT) and player.sprite.position.x > 0:
-        player.sprite.position += (-1,0)
-    elif sf.Keyboard.is_key_pressed(sf.Keyboard.RIGHT) and player.sprite.position.x < WIDTH:
-        player.sprite.position += (1,0)
-
+        delta += (-1,0)
+    elif sf.Keyboard.is_key_pressed(sf.Keyboard.RIGHT) and player.sprite.position.x + player.sprite.size.x < MAP_WIDTH:
+        delta += (1,0)
     if sf.Keyboard.is_key_pressed(sf.Keyboard.UP) and player.sprite.position.y > 0:
-        player.sprite.position += (0,-1)
-    elif sf.Keyboard.is_key_pressed(sf.Keyboard.DOWN) and player.sprite.position.y < HEIGHT:
-        player.sprite.position += (0,1)
+        delta += (0,-1)
+    elif sf.Keyboard.is_key_pressed(sf.Keyboard.DOWN) and player.sprite.position.y + player.sprite.size.y < MAP_HEIGHT:
+        delta += (0,1)
         
     elif sf.Keyboard.is_key_pressed(sf.Keyboard.ESCAPE):
         window.close()
+
+    if sf.Keyboard.is_key_pressed(sf.Keyboard.L_SHIFT):
+        player.velocity = 8
+    else:
+        player.velocity = 2
     
+    view_delta = sf.Vector2()
+    if player.sprite.position.x > WIDTH / 2 and player.sprite.position.x < MAP_WIDTH - WIDTH / 2:
+        view_delta += (delta.x, 0)
+    if player.sprite.position.y > HEIGHT / 2 and player.sprite.position.y < MAP_HEIGHT - HEIGHT / 2:
+        view_delta += (0, delta.y)
+
+    print(delta)
+    player.move(delta)
+    view.move(view_delta.x * player.velocity, view_delta.y * player.velocity)
+    
+    view_delta = sf.Vector2()
+    if player.sprite.position.x > WIDTH / 2 and player.sprite.position.x < MAP_WIDTH - WIDTH / 2:
+        view_delta += (delta.x, 0)
+    if player.sprite.position.y > HEIGHT / 2 and player.sprite.position.y < MAP_HEIGHT - HEIGHT / 2:
+        view_delta += (0, delta.y)
+
+    print(delta)
+    player.move(delta)
+    view.move(view_delta.x * player.velocity, view_delta.y * player.velocity)    
 
     window.clear() # clear screen
     window.draw(background)
