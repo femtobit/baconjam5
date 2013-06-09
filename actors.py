@@ -86,7 +86,13 @@ class Monster(Actor):
         self.direction = random_unit_vector()
         self.direction_timer = sf.Clock()
 
-    def step(self, dt):
+    def step(self, player, dt):
+        if dist(self.position, player.position) <= 220:
+            self.hunt_player(player, dt)
+        else:
+            self.move_randomly(dt)
+
+    def move_randomly(self, dt):
         if self.direction_timer.elapsed_time > sf.seconds(5) \
                 or not MAP_RECT.contains(self.position + (self.direction * self.speed * 10)):
             self.direction = random_unit_vector()
@@ -94,11 +100,11 @@ class Monster(Actor):
 
         self.move(self.direction * self.speed, dt)
 
-    def hunt_player(self, player):
+    def hunt_player(self, player, dt):
         player_direction = player.position - self.position
         delta = (player_direction / norm(player_direction)) * self.speed
 
-        self.move(delta)
+        self.move(delta, dt)
 
     def bite(self, player):
         if self.collides_with(player):
@@ -116,8 +122,6 @@ class Grue(Monster):
         self.sprite.fill_color = sf.Color.BLUE'''
         self.sprite.position = (x, y)
 
-        self.speed = 2
+        self.speed = 1
         self.damage = 1
-
-        
         
