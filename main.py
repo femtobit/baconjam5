@@ -96,7 +96,7 @@ def main():
                 and player.position.y > 0:
             delta += (0,-1)
         elif sf.Keyboard.is_key_pressed(sf.Keyboard.DOWN) \
-                and player.position.y + player.position.y < MAP_HEIGHT:
+                and player.position.y + player.size.y < MAP_HEIGHT:
             delta += (0,1)
 
         elif sf.Keyboard.is_key_pressed(sf.Keyboard.ESCAPE):
@@ -107,6 +107,7 @@ def main():
             delta *= 8
         else:
             delta *= 2
+
         view_delta = sf.Vector2()
         if player.position.x > WIDTH / 2 \
                 and player.position.x < MAP_WIDTH - WIDTH / 2:
