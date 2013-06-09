@@ -45,8 +45,11 @@ def main():
     player = Player(WIDTH / 2, HEIGHT / 2)
     
     for i in range (0, NUMBER_OF_GRUES):
-        creature = Grue(random.randrange(0, MAP_WIDTH),
-                random.randrange(0, MAP_HEIGHT))
+        while True:
+            point = (random.randrange(0, MAP_WIDTH), random.randrange(0, MAP_HEIGHT))
+            if dist(point, player.position) > 250:
+                break
+        creature = Grue(*point)
         print("New Grue at (%s)" % (creature.position))
         creatures.append(creature)
 
