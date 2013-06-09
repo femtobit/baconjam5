@@ -45,7 +45,7 @@ class Actor(sf.Drawable):
 class Player(Actor):
     def __init__(self, x, y):
         Actor.__init__(self)
-        player = sf.Texture.from_file("sombrero4.png")
+        player = sf.Texture.from_file("player.png")
         self.sprite = sf.Sprite(player)
         self.position = (x, y)
         self.health = 5
