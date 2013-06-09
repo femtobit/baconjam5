@@ -6,9 +6,9 @@ import sfml as sf
 def dist(p,q):
     return math.sqrt((p[0]-q[0])**2+(p[1]-q[1])**2)
 
-def collision_radius(object):
-    return object.size.x / 2
-
+def collision_rectangle(Actor):
+    return sf.Rectangle((Actor.position.x, Actor.position.y), Actor.size)
+    
 def norm(v):
     return math.sqrt(v.x * v.x + v.y * v.y)
 

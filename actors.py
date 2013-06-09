@@ -36,9 +36,12 @@ class Actor(sf.Drawable):
             return self.sprite.texture.size
 
     def collides_with(self, object):
-        return dist(self.sprite.position, object.sprite.position) \
-                      <= collision_radius(self) + collision_radius(object) - 3
-
+        r1 = collision_rectangle(self)
+        r2 = collision_rectangle(object)
+        if ((r1.right < r2.left) or (r2.right < r1.left) or (r1.bottom < r2.top) or (r2.bottom < r1.top)):
+            return False
+        else:
+            return True
 class Player(Actor):
     def __init__(self, x, y):
         Actor.__init__(self)
