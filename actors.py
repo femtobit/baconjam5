@@ -154,7 +154,12 @@ class Lives(Actor):
         Actor.__init__(self)
         dagger = sf.Texture.from_file("Dagger.png")
         self.sprite = sf.Sprite(dagger)
-        self.damage = -1
+        self.heal = 1
+        self.sprite.position = (x, y)
+
+    def heal(self, player):
+        if self.collides_with(player):
+            player.health += self.heal
 
     
 
