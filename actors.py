@@ -149,3 +149,12 @@ class Boss(Monster):
         self.speed = 1
         self.damage = 5
 
+class Lives(Actor):
+    def __init__(self, x, y):
+        Actor.__init__(self)
+        dagger = sf.Texture.from_file("Dagger.png")
+        self.sprite = sf.Sprite(dagger)
+        self.damage = -1
+
+    
+

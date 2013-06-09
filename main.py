@@ -14,7 +14,7 @@ from helpers import *
 WIDTH = 640
 HEIGHT = 480
 
-BUS_IMAGE = sf.Image.from_file("bus.png")
+#BUS_IMAGE = sf.Image.from_file("bus.png")
 
 class Overlay(sf.Drawable):
     def __init__(self, actor):
@@ -53,14 +53,14 @@ def main():
     CAUGHT_A_BUS = False
     busses = []
     creatures = []
-    
+    lives = []
     window = sf.RenderWindow(sf.VideoMode(WIDTH, HEIGHT), "A Walk In The Dark")
     
     def end_game():
         window.close()
 
     player = Player(WIDTH / 2, HEIGHT / 2)
-    boss = Boss(random.randrange(0, MAP_WIDTH), random.randrange(0, MAP_HEIGHT))    
+        
     for i in range (0, NUMBER_OF_GRUES):
         while True:
             point = (random.randrange(0, MAP_WIDTH), random.randrange(0, MAP_HEIGHT))
@@ -69,8 +69,10 @@ def main():
         creature = Grue(*point)
         print("New Grue at (%s)" % (creature.position))
         creatures.append(creature)
-    creatures.append(boss)
-
+    for i in range(0, 5):
+        heal = Lives(random.randrange(0, MAP_WIDTH), random.randrange(0, MAP_HEIGHT))
+        lives.append(heal)
+    
     background = sf.Sprite(sf.Texture.from_file("map2.png"))
 
     view = sf.View()
@@ -91,10 +93,10 @@ def main():
         step_timer.restart()
         debug.append("(dt=%i/16 ms)" % dt) 
         if boss_time.elapsed_time == sf.seconds(30):
+            boss = Boss(random.randrange(0, MAP_WIDTH), random.randrange(0, MAP_HEIGHT))
             creatures.append(boss)
         if boss_time.elapsed_time == sf.seconds(45):
             creatures.remove(boss)
-            print ("The Boss in da hause")
             boss_time.restart()
         for c in creatures:
             if c.collides_with(player):
@@ -103,6 +105,10 @@ def main():
                 if player.health <= 0:
                     print("You loose, sorry")
                     window.close()
+        for h in lives:
+            if h.collides_with(player):
+                lives.remove(h)
+                player.health += 1
         for event in window.events:
             if type(event) is sf.CloseEvent:
                 window.close()
@@ -159,6 +165,8 @@ def main():
         window.draw(player)
         for creature in creatures:
             window.draw(creature)
+        for heal in lives:
+            window.draw(heal)
         window.draw(overlay)
 
         window.view = window.default_view
