@@ -5,11 +5,29 @@ from drawables import *
 from constants import *
 
 class State:
-    pass
+    def __init__(self, window):
+        self.has_ended = False
+        self.window = window
+
+class IntroState(State):
+    def __init__(self, window):
+        State.__init__(self, window)
+        self.sprite = sf.Sprite(sf.Texture.from_file("greeting.png"))
+        self.view = sf.View()
+        self.view.reset(sf.Rectangle((0, 0), (WIDTH, HEIGHT)))
+
+    def step(self, dt):
+        for event in self.window.events:
+            if type(event) == sf.KeyEvent and event.pressed:
+                self.has_ended = True
+
+    def draw(self):
+        self.window.view = self.view
+        self.window.draw(self.sprite)
 
 class GameState(State):
     def __init__(self, window):
-        self.window = window
+        State.__init__(self, window)
 
         self.debug = []
 
@@ -65,7 +83,7 @@ class GameState(State):
                 c.bite(self.player)
                 if self.player.health <= 0:
                     print("You loose, sorry")
-                    self.window.close()
+                    self.has_ended = True
 
         for h in self.lives:
             if h.collides_with(self.player):
