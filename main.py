@@ -99,9 +99,8 @@ def main():
         for c in creatures:
             if c.collides_with(player):
                 creatures.remove(c)
-                if player.health > 0:
-                    player.health -= 1
-                if player.health == 0:
+                c.bite(player)
+                if player.health <= 0:
                     print("You loose, sorry")
                     window.close()
         for event in window.events:
@@ -144,6 +143,7 @@ def main():
 
         debug.append("dr: %s" % delta)
         player.move(delta, dt)
+        sf.Listener.set_position((player.position.x, player.position.y, 0))
         view.move(view_delta.x * dt, view_delta.y * dt)
 
         debug.append("Pos: %s" % player.sprite.position)
@@ -152,6 +152,7 @@ def main():
         #Monster movement
         for creature in creatures:
             creature.step(player, dt)
+            creature.sound_tick()
              
         window.clear()
         window.draw(background)

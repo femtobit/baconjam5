@@ -4,11 +4,13 @@ import sfml as sf
 
 from constants import *
 from helpers import *
+import sound
 
 class Actor(sf.Drawable):
     def __init__(self):
         sf.Drawable.__init__(self)
 
+        self.sound_rarity = 0
         self.sprite = sf.CircleShape()
 
     def move(self, dr, dt):
@@ -42,6 +44,16 @@ class Actor(sf.Drawable):
             return False
         else:
             return True
+
+    def sound_tick(self):
+        if random.randint(0, self.sound_rarity) != 0:
+            return
+        try:
+            print("sound tick")
+            self.play_sound()
+        except AttributeError:
+            pass
+
 class Player(Actor):
     def __init__(self, x, y):
         Actor.__init__(self)
@@ -64,13 +76,13 @@ class Bus(Actor):
         self.sprite.outline_color = sf.Color.BLUE
         self.sprite.outline_thickness = 2
         self.position = (x, y)
-        
+
     def draw(self, target, states):
         target.draw(self.sprite, states)
 
     def move(self):
         if (self.position.x > 342 and self.position.y > 0):
-            super(self, Bus).move(0, 1)
+            super(Bus, self).move(0, 1)
 
     def get_number(self):
         return self.start_number
@@ -78,7 +90,7 @@ class Bus(Actor):
 class Monster(Actor):
     def __init__(self):
         Actor.__init__(self)
-                
+
         self.direction = random_unit_vector()
         self.direction_timer = sf.Clock()
 
@@ -105,21 +117,27 @@ class Monster(Actor):
     def bite(self, player):
         if self.collides_with(player):
             player.health -= self.damage
-            if player.health <= 0:
-                window.close()
 
 class Grue(Monster):
     def __init__(self, x, y):
         Monster.__init__(self)
         small_monster = sf.Texture.from_file("small_monster.png")
         self.sprite = sf.Sprite(small_monster)
-        '''self.sprite = sf.RectangleShape()
-        self.sprite.size = (5, 5)
-        self.sprite.fill_color = sf.Color.BLUE'''
         self.sprite.position = (x, y)
 
         self.speed = 1
         self.damage = 1
+        self.sound_rarity = 4800
+
+    def bite(self, player):
+        sound.roar.play()
+        print("played sound")
+        super(Grue, self).bite(player)
+
+    def play_sound(self):
+        sound.grue.position = vector2to3(self.position)
+        if sound.grue.status != sf.SoundSource.PLAYING:
+            sound.grue.play()
 
 class Boss(Monster):
     def __init__(self, x, y):
@@ -130,4 +148,4 @@ class Boss(Monster):
 
         self.speed = 1
         self.damage = 5
-        
+

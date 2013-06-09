@@ -23,3 +23,6 @@ def random_unit_vector():
     Returns a vector of length 1 with random direction.
     """
     return normalize(sf.Vector2(random.randint(0,100) - 50, random.randint(0,100) - 50))
+
+def vector2to3(vec2, z = 0):
+    return sf.Vector3(vec2.x, vec2.y, z)
