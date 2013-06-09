@@ -110,6 +110,7 @@ class GameState(State):
         self.boss_time = sf.Clock()
         self.run_timer = sf.Clock()
         self.treasure_time = sf.Clock()
+        self.stamina_regeneration_timer = sf.Clock()
 
         self.is_running = False
         self.has_boss = False
@@ -128,7 +129,7 @@ class GameState(State):
             self.creatures.remove(boss)
             self.boss_ime.restart()
 
-        if not self.has_treasure and self.treasure_time.elapsed_time >= sf.seconds(5):
+        if not self.has_treasure and self.treasure_time.elapsed_time >= sf.seconds(120):
             self.treasure = Treasure(random.randrange(0, MAP_WIDTH), random.randrange(0, MAP_HEIGHT))
             print("Treasure spawned at %s" % self.treasure.position)
             self.has_treasure = True
@@ -194,6 +195,13 @@ class GameState(State):
         for creature in self.creatures:
             creature.step(self.player, dt)
             creature.sound_tick()
+
+        if self.stamina_regeneration_timer.elapsed_time >= sf.seconds(5) \
+                and self.player.stamina < self.player.max_stamina:
+            if self.player.stamina < 0:
+                self.player.stamina = 0
+            self.player.stamina += 1
+            self.stamina_regeneration_timer.restart()
 
         self.life_point_display.points = self.player.health
         self.stamina_display.points = self.player.stamina
