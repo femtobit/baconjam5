@@ -26,6 +26,27 @@ class IntroState(State):
         self.window.view = self.view
         self.window.draw(self.sprite)
 
+class GameWonState(State):
+    def __init__(self, window):
+        State.__init__(self, window)
+        self.sprite = sf.Sprite(sf.Texture.from_file("WinMessage.png"))
+        self.view = sf.View()
+        self.view.reset(sf.Rectangle((0, 0), (WIDTH, HEIGHT)))
+
+    def draw(self):
+        self.window.view = self.view
+        self.window.draw(self.sprite)
+
+    def step(self, dt):
+        for event in self.window.events:
+            if type(event) == sf.KeyEvent and event.pressed:
+                if event.code == sf.Keyboard.ESCAPE:
+                    self.has_ended = True
+                    self.next_state = None
+                elif event.code == sf.Keyboard.RETURN:
+                    self.has_ended = True
+                    self.next_state = GameState
+
 class GameOverState(State):
     def __init__(self, window):
         State.__init__(self, window)
@@ -86,19 +107,32 @@ class GameState(State):
                 self.player.health, sf.Color.RED)
 
         self.boss_time = sf.Clock()
-
+        self.treasure_time = sf.Clock()
+        
+        self.has_boss = False
+        self.has_treasure = False
+        
     def step(self, dt):
         self.debug = []
 
         self.debug.append("(dt=%i/16 ms)" % dt) 
 
-        if self.boss_time.elapsed_time == sf.seconds(30):
+        if not self.has_boss and self.boss_time.elapsed_time >= sf.seconds(30):
             boss = Boss(random.randrange(0, MAP_WIDTH), random.randrange(0, MAP_HEIGHT))
             self.creatures.append(boss)
-        if self.boss_time.elapsed_time == sf.seconds(45):
+            self.has_boss = True
+        if self.has_boss and self.boss_time.elapsed_time == sf.seconds(45):
             self.creatures.remove(boss)
-            self.boss_time.restart()
-
+            self.boss_ime.restart()
+            
+        if not self.has_treasure and self.treasure_time.elapsed_time >= sf.seconds(5):
+            self.treasure = Treasure(random.randrange(0, MAP_WIDTH), random.randrange(0, MAP_HEIGHT))
+            print("Treasure spawned at %s" % self.treasure.position)
+            self.has_treasure = True
+        if self.has_treasure and self.treasure.win_condition(self.player):
+            self.has_ended = True
+            self.next_state = GameWonState
+            
         for c in self.creatures:
             if c.collides_with(self.player):
                 self.creatures.remove(c)
@@ -152,6 +186,8 @@ class GameState(State):
             self.window.draw(creature)
         for heal in self.lives:
             self.window.draw(heal)
+        if self.has_treasure:
+            self.window.draw(self.treasure)
         self.window.draw(self.overlay)
 
         self.window.view = self.window.default_view

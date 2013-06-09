@@ -49,7 +49,7 @@ class Actor(sf.Drawable):
         if random.randint(0, self.sound_rarity) != 0:
             return
         try:
-            print("sound tick")
+            #print("sound tick")
             self.play_sound()
         except AttributeError:
             pass
@@ -162,3 +162,13 @@ class Lives(Actor):
         player.health += self.health
         sound.heal.play()
 
+class Treasure(Actor):
+    def __init__(self, x, y):
+        Actor.__init__(self)
+        self.sprite = sf.Sprite(sf.Texture.from_file("treasure.png"))
+        self.sprite.position = (x, y)
+
+    def win_condition(self, player):
+        return False#self.collides_with(player)
+            
+            
