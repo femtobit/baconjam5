@@ -20,6 +20,28 @@ class IntroState(State):
         for event in self.window.events:
             if type(event) == sf.KeyEvent and event.pressed:
                 self.has_ended = True
+                self.next_state = GameState
+
+    def draw(self):
+        self.window.view = self.view
+        self.window.draw(self.sprite)
+
+class GameOverState(State):
+    def __init__(self, window):
+        State.__init__(self, window)
+        self.sprite = sf.Sprite(sf.Texture.from_file("endtext.png"))
+        self.view = sf.View()
+        self.view.reset(sf.Rectangle((0, 0), (WIDTH, HEIGHT)))
+
+    def step(self, dt):
+        for event in self.window.events:
+            if type(event) == sf.KeyEvent and event.pressed:
+                if event.code == sf.Keyboard.ESCAPE:
+                    self.has_ended = True
+                    self.next_state = None
+                elif event.code == sf.Keyboard.RETURN:
+                    self.has_ended = True
+                    self.next_state = GameState
 
     def draw(self):
         self.window.view = self.view
@@ -82,8 +104,8 @@ class GameState(State):
                 self.creatures.remove(c)
                 c.bite(self.player)
                 if self.player.health <= 0:
-                    print("You loose, sorry")
                     self.has_ended = True
+                    self.next_state = GameOverState
 
         for h in self.lives:
             if h.collides_with(self.player):

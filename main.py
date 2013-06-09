@@ -21,19 +21,17 @@ def main():
     def end_game():
         window.close()
 
-    states = [IntroState, GameState]
     state_counter = 0
-    current_state = None
+    current_state = IntroState(window)
 
     step_timer = sf.Clock()
 
     while window.is_open:
-        if current_state is None or current_state.has_ended:
-            state_counter += 1
-            if state_counter < 2:
-                current_state = states[state_counter](window)
-            else:
+        if current_state.has_ended:
+            if current_state.next_state is None:
                 window.close()
+            else:
+                current_state = current_state.next_state(window)
 
         dt = step_timer.elapsed_time.milliseconds / 16.0
         step_timer.restart()
