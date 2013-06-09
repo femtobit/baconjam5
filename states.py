@@ -103,17 +103,12 @@ class GameState(State):
 
         self.player = Player(WIDTH / 2, HEIGHT / 2)
 
-        for i in range (0, NUMBER_OF_GRUES):
-            while True:
-                point = (random.randrange(0, MAP_WIDTH),
-                        random.randrange(0, MAP_HEIGHT))
-                if dist(point, self.player.position) > 250:
-                    break
-            creature = Grue(*point)
+        for i in range (0, random.randint(MIN_GRUES, MAX_GRUES)):
+            creature = Grue(*random_point_not_near(self.player.position))
             print("New Grue at (%s)" % (creature.position))
             self.creatures.append(creature)
 
-        for i in range(0, 5):
+        for i in range(0, random.randint(MIN_HEALS, MAX_HEALS)):
             heal = Lives(random.randrange(0, MAP_WIDTH),
                     random.randrange(0, MAP_HEIGHT))
             self.lives.append(heal)
@@ -144,20 +139,14 @@ class GameState(State):
 
         self.debug.append("(dt=%i/16 ms)" % dt) 
 
-        '''if not self.has_boss and self.boss_time.elapsed_time >= sf.seconds(30):
-            boss = Boss(random.randrange(0, MAP_WIDTH), random.randrange(0, MAP_HEIGHT))
-            
-            self.has_boss = True
-        if self.has_boss and self.boss_time.elapsed_time == sf.seconds(45):
-            self.creatures.remove(boss)
-            self.boss_ime.restart()'''
-
         if not self.has_treasure and self.treasure_time.elapsed_time >= sf.seconds(120):
-            self.treasure = Treasure(random.randrange(0, MAP_WIDTH), random.randrange(0, MAP_HEIGHT))
-            self.boss = Boss(random.randrange(0, MAP_WIDTH), random.randrange(0, MAP_HEIGHT))
+            self.treasure = Treasure(random_point_not_near(self.player.position))
+            self.boss = Boss(random_point_not_near(self.player.position))
             self.creatures.append(boss)
+
             print("Treasure spawned at %s" % self.treasure.position)
             self.has_treasure = True
+            
         if self.has_treasure and self.treasure.win_condition(self.player):
             self.has_ended = True
             self.next_state = GameWonState

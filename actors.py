@@ -64,7 +64,7 @@ class Player(Actor):
 
         self.max_health = 5
         self.health = self.max_health
-        self.max_stamina = 3
+        self.max_stamina = 4
         self.stamina = self.max_stamina
 
     def draw(self, target, states):
@@ -100,7 +100,7 @@ class Monster(Actor):
         self.direction_timer = sf.Clock()
 
     def step(self, player, dt):
-        if dist(self.position, player.position) <= 220:
+        if dist(self.position, player.position) <= 180:
             self.hunt_player(player, dt)
         else:
             self.move_randomly(dt)
@@ -152,8 +152,11 @@ class Boss(Monster):
         self.sprite = sf.Sprite(big_monster)
         self.sprite.position = (x, y)
 
-        self.speed = 1
+        self.speed = 1.10
         self.damage = 5
+
+    def step(self, player, dt):
+        self.hunt_player(player, dt)
 
     def kill(self, player):
         pass
