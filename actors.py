@@ -78,11 +78,7 @@ class Bus(Actor):
 class Monster(Actor):
     def __init__(self):
         Actor.__init__(self)
-        self.speed = 1
-        self.damage = 5
-        big_monster = sf.Texture.from_file("big_monster.png")
-        self.sprite = sf.Sprite(big_monster)
-        
+                
         self.direction = random_unit_vector()
         self.direction_timer = sf.Clock()
 
@@ -124,4 +120,14 @@ class Grue(Monster):
 
         self.speed = 1
         self.damage = 1
+
+class Boss(Monster):
+    def __init__(self, x, y):
+        Monster.__init__(self)
+        big_monster = sf.Texture.from_file("big_monster.png")
+        self.sprite = sf.Sprite(big_monster)
+        self.sprite.position = (x, y)
+
+        self.speed = 1
+        self.damage = 5
         

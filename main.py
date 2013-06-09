@@ -53,7 +53,7 @@ def main():
     CAUGHT_A_BUS = False
     busses = []
     creatures = []
-
+    
     window = sf.RenderWindow(sf.VideoMode(WIDTH, HEIGHT), "A Walk In The Dark")
     
     def end_game():
@@ -61,6 +61,10 @@ def main():
 
     player = Player(WIDTH / 2, HEIGHT / 2)
     
+    boss_time = sf.Clock()
+    if boss_time.elapsed_time == sf.seconds(5):
+        boss = Boss(random.randrange(0, MAP_WIDTH), random.randrange(0, MAP_HEIGHT))
+        creatures.append(boss)
     for i in range (0, NUMBER_OF_GRUES):
         while True:
             point = (random.randrange(0, MAP_WIDTH), random.randrange(0, MAP_HEIGHT))
@@ -82,14 +86,16 @@ def main():
             player.health, sf.Color.RED)
 
     step_timer = sf.Clock()
-
+    
     while window.is_open:
         debug = []
 
         dt = step_timer.elapsed_time.milliseconds / 16.0
         step_timer.restart()
         debug.append("(dt=%i/16 ms)" % dt) 
-        
+        if boss_time.elapsed_time == sf.seconds(15):
+            creatures.remove(boss)
+            boss_time.restart()
         for c in creatures:
             if c.collides_with(player):
                 creatures.remove(c)
