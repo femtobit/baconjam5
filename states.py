@@ -95,7 +95,7 @@ class GameState(State):
     def __init__(self, window):
         State.__init__(self, window)
 
-        self.debug = []
+        #self.debug = []
 
         self.busses = []
         self.creatures = []
@@ -105,7 +105,7 @@ class GameState(State):
 
         for i in range (0, random.randint(MIN_GRUES, MAX_GRUES)):
             creature = Grue(*random_point_not_near(self.player.position))
-            print("New Grue at (%s)" % (creature.position))
+            #print("New Grue at (%s)" % (creature.position))
             self.creatures.append(creature)
 
         for i in range(0, random.randint(MIN_HEALS, MAX_HEALS)):
@@ -137,9 +137,9 @@ class GameState(State):
         self.has_treasure = False
 
     def step(self, dt):
-        self.debug = []
+        #self.debug = []
 
-        self.debug.append("(dt=%i/16 ms)" % dt) 
+        #self.debug.append("(dt=%i/16 ms)" % dt) 
 
         if not self.has_treasure and self.treasure_time.elapsed_time >= sf.seconds(120):
             self.treasure = Treasure(*random_point_not_near(self.player.position))
@@ -147,7 +147,7 @@ class GameState(State):
             self.creatures.append(self.boss)
             sound.boss1.play()
 
-            print("Treasure spawned at %s" % self.treasure.position)
+            #print("Treasure spawned at %s" % self.treasure.position)
             self.has_treasure = True
 
         if self.has_treasure and self.treasure.win_condition(self.player):
@@ -193,8 +193,8 @@ class GameState(State):
         if self.is_running and self.run_timer.elapsed_time >= sf.seconds(1):
             exhaust()
 
-        if self.is_running:
-            self.debug.append("sprint (" + str(self.run_timer.elapsed_time.seconds) + ")")
+        #if self.is_running:
+        #    self.debug.append("sprint (" + str(self.run_timer.elapsed_time.seconds) + ")")
 
         if self.player.stamina > 0:
             delta = self.player_movement_vector(self.player)
@@ -209,15 +209,14 @@ class GameState(State):
                 and self.player.position.y < MAP_HEIGHT - HEIGHT / 2:
                     view_delta += (0, delta.y)
 
-        self.debug.append("dr: %s" % delta)
+        #self.debug.append("dr: %s" % delta)
         self.player.move(delta, dt)
 
         sf.Listener.set_position((self.player.position.x,
             self.player.position.y, 0))
         self.view.move(view_delta.x * dt, view_delta.y * dt)
 
-        self.debug.append("Pos: %s" %
-                self.player.position)
+        #self.debug.append("Pos: %s" % self.player.position)
 
         #Monster movement
         for creature in self.creatures:
@@ -253,12 +252,12 @@ class GameState(State):
 
         self.window.view = self.window.default_view
 
-        debug_text = sf.Text(", ".join(self.debug))
-        debug_text.color = sf.Color.RED
-        debug_text.position = (0, HEIGHT - 20)
-        debug_text.character_size = 12
+        #debug_text = sf.Text(", ".join(self.debug))
+        #debug_text.color = sf.Color.RED
+        #debug_text.position = (0, HEIGHT - 20)
+        #debug_text.character_size = 12
+        #self.window.draw(debug_text)
 
-        self.window.draw(debug_text)
         self.window.draw(self.life_point_display)
         self.window.draw(self.stamina_display)
 

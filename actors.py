@@ -140,7 +140,7 @@ class Grue(Monster):
 
     def bite(self, player):
         sound.roar.play()
-        print("played sound")
+        #print("played sound")
         super(Grue, self).bite(player)
 
     def play_sound(self):
@@ -164,7 +164,7 @@ class Boss(Monster):
         self.hunt_player(player, dt)
 
     def play_sound(self):
-        print("play boss")
+        #print("play boss")
         snd = random.choice([sound.boss1, sound.boss2])
         if snd.status != sf.SoundSource.PLAYING:
             snd.position = vector2to3(self.postion)
