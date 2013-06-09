@@ -137,7 +137,7 @@ def main():
 
         #Monster movement
         for creature in creatures:
-            creature.step(dt)
+            creature.step(player, dt)
              
         window.clear()
         window.draw(background)
