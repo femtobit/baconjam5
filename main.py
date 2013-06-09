@@ -24,8 +24,8 @@ class Overlay(sf.Drawable):
         self.sprite = sf.Sprite(self.texture)
 
     def draw(self, target, states):
-        center = (self.actor.sprite.position.x + self.actor.sprite.size.x / 2,
-                  self.actor.sprite.position.y + self.actor.sprite.size.y / 2)
+        center = (self.actor.position.x + self.actor.size.x / 2,
+                  self.actor.position.y + self.actor.size.y / 2)
         self.sprite.position = center - self.texture.size / 2
         target.draw(self.sprite)
 
@@ -69,19 +69,12 @@ def main():
         
         for c in creatures:
             if c.collides_with(player):
-                print("You were eaten, sorry(((")
-                window.close()
-
-        '''for b in busses:
-            if b.collides_with(player):
-                print("You were knocked down by the bus, sorry(((")
-                window.close()
-
-        for c in creatures:
-            for b in busses:
-                if b.collides_with(c):
-                    creatures.remove(c)'''
-
+                creatures.remove(c)
+                if player.health > 0:
+                    player.health -= 1
+                if player.health == 0:
+                    print("You loose, sorry")
+                    window.close()
         for event in window.events:
             if type(event) is sf.CloseEvent:
                 window.close()
@@ -91,16 +84,16 @@ def main():
 
         delta = sf.Vector2()
         if sf.Keyboard.is_key_pressed(sf.Keyboard.LEFT) \
-                and player.sprite.position.x > 0:
+                and player.position.x > 0:
             delta += (-1,0)
         elif sf.Keyboard.is_key_pressed(sf.Keyboard.RIGHT) \
-                and player.sprite.position.x + player.sprite.size.x < MAP_WIDTH:
+                and player.position.x + player.size.x < MAP_WIDTH:
             delta += (1,0)
         if sf.Keyboard.is_key_pressed(sf.Keyboard.UP) \
-                and player.sprite.position.y > 0:
+                and player.position.y > 0:
             delta += (0,-1)
         elif sf.Keyboard.is_key_pressed(sf.Keyboard.DOWN) \
-                and player.sprite.position.y + player.sprite.size.y < MAP_HEIGHT:
+                and player.position.y + player.position.y < MAP_HEIGHT:
             delta += (0,1)
 
         elif sf.Keyboard.is_key_pressed(sf.Keyboard.ESCAPE):
@@ -112,11 +105,11 @@ def main():
         else:
             delta *= 2
         view_delta = sf.Vector2()
-        if player.sprite.position.x > WIDTH / 2 \
-                and player.sprite.position.x < MAP_WIDTH - WIDTH / 2:
+        if player.position.x > WIDTH / 2 \
+                and player.position.x < MAP_WIDTH - WIDTH / 2:
             view_delta += (delta.x, 0)
-        if player.sprite.position.y > HEIGHT / 2 \
-                and player.sprite.position.y < MAP_HEIGHT - HEIGHT / 2:
+        if player.position.y > HEIGHT / 2 \
+                and player.position.y < MAP_HEIGHT - HEIGHT / 2:
             view_delta += (0, delta.y)
 
         debug.append("dr: %s" % delta)
@@ -126,15 +119,6 @@ def main():
         debug.append("Pos: %s" % player.sprite.position)
         debug.append("Period: %i" % PERIOD_OF_TIME)
 
-
-        '''for bus in busses:
-            if bus.sprite.position.y > 0:
-                bus.move(0, -1)
-            else:
-                busses.remove(bus)
-            for bus in busses:
-                bus.move()'''
-
         #Monster movement
         for creature in creatures:
             creature.step(dt)
@@ -142,8 +126,6 @@ def main():
         window.clear()
         window.draw(background)
         window.draw(player)
-        for bus in busses:
-            window.draw(bus)
         for creature in creatures:
             window.draw(creature)
         window.draw(overlay)

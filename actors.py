@@ -45,10 +45,8 @@ class Actor(sf.Drawable):
 class Player(Actor):
     def __init__(self, x, y):
         Actor.__init__(self)
-
-        self.sprite = sf.RectangleShape()
-        self.sprite.size = (30, 30)
-        self.sprite.fill_color = sf.Color.RED
+        player = sf.Texture.from_file("sombrero4.png")
+        self.sprite = sf.Sprite(player)
         self.position = (x, y)
         self.health = 5
 
@@ -82,7 +80,9 @@ class Monster(Actor):
         Actor.__init__(self)
         self.speed = 1
         self.damage = 5
-
+        big_monster = sf.Texture.from_file("big_monster.png")
+        self.sprite = sf.Sprite(big_monster)
+        
         self.direction = random_unit_vector()
         self.direction_timer = sf.Clock()
 
