@@ -1,10 +1,14 @@
 import sfml as sf
 
 class Overlay(sf.Drawable):
-    def __init__(self, actor):
+    def __init__(self, actor, dark=False):
         self.actor = actor
 
-        self.texture = sf.Texture.from_file("overlay.png")
+        if dark:
+            self.texture = sf.Texture.from_file("overlay-dark.png")
+        else:
+            self.texture = sf.Texture.from_file("overlay.png")
+
         self.sprite = sf.Sprite(self.texture)
 
     def draw(self, target, states):

@@ -119,6 +119,7 @@ class GameState(State):
         self.window.view = self.view
 
         self.overlay = Overlay(self.player)
+        self.dark_overlay = Overlay(self.player, dark=True)
 
         self.life_point_display = PointDisplay(sf.Rectangle(
             (10, 10), (100, 10)), self.player.health, sf.Color.RED)
@@ -131,6 +132,7 @@ class GameState(State):
         self.stamina_regeneration_timer = sf.Clock()
 
         self.is_running = False
+        self.is_dark = False
         self.has_boss = False
         self.has_treasure = False
 
@@ -177,6 +179,9 @@ class GameState(State):
                     and event.pressed and event.code == sf.Keyboard.ESCAPE):
                 self.next_state = ExitState
                 self.has_ended = True
+            elif type(event) is sf.KeyEvent and event.pressed \
+                    and event.code == sf.Keyboard.X:
+                self.is_dark = not self.is_dark
             elif type(event) is sf.KeyEvent and event.code == sf.Keyboard.L_SHIFT:
                 if event.pressed and not self.is_running:
                     self.is_running = True
@@ -215,7 +220,7 @@ class GameState(State):
 
         #Monster movement
         for creature in self.creatures:
-            creature.step(self.player, dt)
+            creature.step(self.player, self.is_dark, dt)
             creature.sound_tick()
 
         if self.stamina_regeneration_timer.elapsed_time >= sf.seconds(5) \
@@ -239,7 +244,11 @@ class GameState(State):
             self.window.draw(heal)
         if self.has_treasure:
             self.window.draw(self.treasure)
-        self.window.draw(self.overlay)
+
+        if self.is_dark:
+            self.window.draw(self.dark_overlay)
+        else:
+            self.window.draw(self.overlay)
 
         self.window.view = self.window.default_view
 

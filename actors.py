@@ -99,8 +99,12 @@ class Monster(Actor):
         self.direction = random_unit_vector()
         self.direction_timer = sf.Clock()
 
-    def step(self, player, dt):
-        if dist(self.position, player.position) <= 180:
+    def step(self, player, is_dark, dt):
+        if is_dark:
+            range = 60
+        else:
+            range = 180
+        if dist(self.position, player.position) <= range and not is_dark:
             self.hunt_player(player, dt)
         else:
             self.move_randomly(dt)
@@ -155,7 +159,7 @@ class Boss(Monster):
         self.speed = 1.10
         self.damage = 5
 
-    def step(self, player, dt):
+    def step(self, player, is_dark, dt):
         self.hunt_player(player, dt)
 
     def kill(self, player):
