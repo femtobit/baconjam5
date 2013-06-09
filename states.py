@@ -26,6 +26,28 @@ class IntroState(State):
         self.window.view = self.view
         self.window.draw(self.sprite)
 
+class ExitState(State):
+    def __init__(self, window):
+        State.__init__(self, window)
+        self.sprite = sf.Sprite(sf.Texture.from_file("exitmodus.png"))
+        self.view = sf.View()
+        self.view.reset(sf.Rectangle((0, 0), (WIDTH, HEIGHT)))
+        
+    def step(self, dt):
+        for event in self.window.events:
+            if type(event) == sf.KeyEvent and event.pressed:
+                if event.code == sf.Keyboard.ESCAPE:
+                    self.has_ended = True
+                    self.next_state = GameState
+                elif event.code == sf.Keyboard.RETURN:
+                    self.has_ended = True
+                    self.next_state = None
+
+    def draw(self):
+        self.window.view = self.view
+        self.window.draw(self.sprite)
+        
+
 class GameWonState(State):
     def __init__(self, window):
         State.__init__(self, window)
@@ -42,10 +64,9 @@ class GameWonState(State):
             if type(event) == sf.KeyEvent and event.pressed:
                 if event.code == sf.Keyboard.ESCAPE:
                     self.has_ended = True
-                    self.next_state = None
                 elif event.code == sf.Keyboard.RETURN:
                     self.has_ended = True
-                    self.next_state = GameState
+                    self.next_state = None
 
 class GameOverState(State):
     def __init__(self, window):
@@ -149,10 +170,13 @@ class GameState(State):
             if h.collides_with(self.player):
                 self.lives.remove(h)
                 h.heal(self.player)
-
+        
         for event in self.window.events:
-            if type(event) is sf.CloseEvent:
-                self.window.close()
+            if type(event) is sf.CloseEvent \
+                    or (type(event) is sf.KeyEvent \
+                    and event.pressed and event.code == sf.Keyboard.ESCAPE):
+                self.next_state = ExitState
+                self.has_ended = True
             elif type(event) is sf.KeyEvent and event.code == sf.Keyboard.L_SHIFT:
                 if event.pressed and not self.is_running:
                     self.is_running = True
