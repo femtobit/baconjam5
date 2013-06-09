@@ -252,11 +252,11 @@ class GameState(State):
 
         self.window.view = self.window.default_view
 
-        #debug_text = sf.Text(", ".join(self.debug))
-        #debug_text.color = sf.Color.RED
-        #debug_text.position = (0, HEIGHT - 20)
-        #debug_text.character_size = 12
-        #self.window.draw(debug_text)
+        text = sf.Text("Find the treasure!")
+        text.color = sf.Color.YELLOW
+        text.position = (0, HEIGHT - 20)
+        text.character_size = 12
+        if self.has_treasure: self.window.draw(text)
 
         self.window.draw(self.life_point_display)
         self.window.draw(self.stamina_display)
