@@ -150,6 +150,9 @@ class Boss(Monster):
         self.speed = 1
         self.damage = 5
 
+    def kill(self, player):
+        pass
+
 class Lives(Actor):
     def __init__(self, x, y):
         Actor.__init__(self)
@@ -169,6 +172,6 @@ class Treasure(Actor):
         self.sprite.position = (x, y)
 
     def win_condition(self, player):
-        return False#self.collides_with(player)
+        return self.collides_with(player)
             
             
