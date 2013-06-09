@@ -137,6 +137,7 @@ class Grue(Monster):
     def play_sound(self):
         sound.grue.position = vector2to3(self.position)
         if sound.grue.status != sf.SoundSource.PLAYING:
+            sound.grue.attenuation = 150
             sound.grue.play()
 
 class Boss(Monster):

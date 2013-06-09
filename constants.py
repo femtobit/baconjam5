@@ -1,5 +1,8 @@
 import sfml as sf
 
+WIDTH = 640
+HEIGHT = 480
+
 MAP_WIDTH = 1000
 MAP_HEIGHT = 1400
 
