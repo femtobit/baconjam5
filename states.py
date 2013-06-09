@@ -34,7 +34,7 @@ class ExitState(State):
         self.sprite = sf.Sprite(sf.Texture.from_file("exitmodus.png"))
         self.view = sf.View()
         self.view.reset(sf.Rectangle((0, 0), (WIDTH, HEIGHT)))
-        
+
     def step(self, dt):
         for event in self.window.events:
             if type(event) == sf.KeyEvent and event.pressed:
@@ -48,7 +48,7 @@ class ExitState(State):
     def draw(self):
         self.window.view = self.view
         self.window.draw(self.sprite)
-        
+
 
 class GameWonState(State):
     def __init__(self, window):
@@ -123,7 +123,7 @@ class GameState(State):
         self.life_point_display = PointDisplay(sf.Rectangle(
             (10, 10), (100, 10)), self.player.health, sf.Color.RED)
         self.stamina_display = PointDisplay(sf.Rectangle((WIDTH - 60 -10, 10), (60, 10)),
-            self.player.max_stamina, sf.Color.GREEN)
+                self.player.max_stamina, sf.Color.GREEN)
 
         self.boss_time = sf.Clock()
         self.run_timer = sf.Clock()
@@ -146,7 +146,7 @@ class GameState(State):
 
             print("Treasure spawned at %s" % self.treasure.position)
             self.has_treasure = True
-            
+
         if self.has_treasure and self.treasure.win_condition(self.player):
             self.has_ended = True
             self.next_state = GameWonState
@@ -163,7 +163,14 @@ class GameState(State):
             if h.collides_with(self.player):
                 self.lives.remove(h)
                 h.heal(self.player)
-        
+
+        def exhaust():
+            self.is_running = False
+            self.player.stamina -= 1
+            if self.player.stamina <= 0:
+                sound.exhausted.play()
+            self.stamina_regeneration_timer.restart()
+
         for event in self.window.events:
             if type(event) is sf.CloseEvent \
                     or (type(event) is sf.KeyEvent \
@@ -175,12 +182,10 @@ class GameState(State):
                     self.is_running = True
                     self.run_timer.restart()
                 elif event.released and self.is_running:
-                    self.is_running = False
-                    self.player.stamina -= 1
+                    exhaust()
 
         if self.is_running and self.run_timer.elapsed_time >= sf.seconds(1):
-            self.is_running = False
-            self.player.stamina -= 1
+            exhaust()
 
         if self.is_running:
             self.debug.append("sprint (" + str(self.run_timer.elapsed_time.seconds) + ")")
@@ -193,10 +198,10 @@ class GameState(State):
         view_delta = sf.Vector2()
         if self.player.position.x > WIDTH / 2 \
                 and self.player.position.x < MAP_WIDTH - WIDTH / 2:
-            view_delta += (delta.x, 0)
+                    view_delta += (delta.x, 0)
         if self.player.position.y > HEIGHT / 2 \
                 and self.player.position.y < MAP_HEIGHT - HEIGHT / 2:
-            view_delta += (0, delta.y)
+                    view_delta += (0, delta.y)
 
         self.debug.append("dr: %s" % delta)
         self.player.move(delta, dt)
