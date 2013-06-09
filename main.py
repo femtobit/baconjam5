@@ -18,21 +18,13 @@ def main():
 
     window = sf.RenderWindow(sf.VideoMode(WIDTH, HEIGHT), "A Walk In The Dark")
     
-    def end_game():
-        window.close()
-
     state_counter = 0
     current_state = IntroState(window)
+    last_state = None
 
     step_timer = sf.Clock()
 
     while window.is_open:
-        if current_state.has_ended:
-            if current_state.next_state is None:
-                window.close()
-            else:
-                current_state = current_state.next_state(window)
-
         dt = step_timer.elapsed_time.milliseconds / 16.0
         step_timer.restart()
         
@@ -42,6 +34,17 @@ def main():
         current_state.draw()
         window.display()
 
+        if current_state.has_ended:
+            old_current_state = current_state
+            if current_state.next_state is None:
+                window.close()
+            elif current_state.next_state == State.PREVIOUS_STATE:
+                print("restoring previous state")
+                current_state = last_state
+            else:
+                current_state = current_state.next_state(window)
+            last_state = old_current_state
+            last_state.has_ended = False
 
 if __name__ == "__main__":
     main()

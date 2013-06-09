@@ -5,6 +5,8 @@ from drawables import *
 from constants import *
 
 class State:
+    PREVIOUS_STATE = "previous"
+
     def __init__(self, window):
         self.has_ended = False
         self.window = window
@@ -38,7 +40,7 @@ class ExitState(State):
             if type(event) == sf.KeyEvent and event.pressed:
                 if event.code == sf.Keyboard.ESCAPE:
                     self.has_ended = True
-                    self.next_state = GameState
+                    self.next_state = State.PREVIOUS_STATE
                 elif event.code == sf.Keyboard.RETURN:
                     self.has_ended = True
                     self.next_state = None
