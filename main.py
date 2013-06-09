@@ -46,6 +46,29 @@ class PointDisplay(sf.Drawable):
                                     self.rect.position.y)
             target.draw(shape, states)
 
+def player_movement_vector(player):
+    delta = sf.Vector2()
+    if sf.Keyboard.is_key_pressed(sf.Keyboard.LEFT) \
+            and player.position.x > 0:
+                delta += (-1,0)
+    elif sf.Keyboard.is_key_pressed(sf.Keyboard.RIGHT) \
+            and player.position.x + player.size.x < MAP_WIDTH:
+                delta += (1,0)
+    if sf.Keyboard.is_key_pressed(sf.Keyboard.UP) \
+            and player.position.y > 0:
+                delta += (0,-1)
+    elif sf.Keyboard.is_key_pressed(sf.Keyboard.DOWN) \
+            and player.position.y + player.size.y < MAP_HEIGHT:
+                delta += (0,1)
+    delta = normalize(delta)
+
+    if sf.Keyboard.is_key_pressed(sf.Keyboard.L_SHIFT):
+        delta *= 8
+    else:
+        delta *= 2
+
+    return delta
+
 def main():
     random.seed(datetime.datetime.now())
 
@@ -69,6 +92,7 @@ def main():
         creature = Grue(*point)
         print("New Grue at (%s)" % (creature.position))
         creatures.append(creature)
+
     for i in range(0, 5):
         heal = Lives(random.randrange(0, MAP_WIDTH), random.randrange(0, MAP_HEIGHT))
         lives.append(heal)
@@ -86,6 +110,7 @@ def main():
 
     step_timer = sf.Clock()
     boss_time = sf.Clock()
+
     while window.is_open:
         debug = []
 
@@ -98,6 +123,7 @@ def main():
         if boss_time.elapsed_time == sf.seconds(45):
             creatures.remove(boss)
             boss_time.restart()
+
         for c in creatures:
             if c.collides_with(player):
                 creatures.remove(c)
@@ -105,10 +131,12 @@ def main():
                 if player.health <= 0:
                     print("You loose, sorry")
                     window.close()
+
         for h in lives:
             if h.collides_with(player):
                 lives.remove(h)
                 player.health += 1
+
         for event in window.events:
             if type(event) is sf.CloseEvent:
                 window.close()
@@ -116,28 +144,7 @@ def main():
         debug.append("Pos: %s" % player.position)
         debug.append("Period: %i" % PERIOD_OF_TIME)
 
-        delta = sf.Vector2()
-        if sf.Keyboard.is_key_pressed(sf.Keyboard.LEFT) \
-                and player.position.x > 0:
-            delta += (-1,0)
-        elif sf.Keyboard.is_key_pressed(sf.Keyboard.RIGHT) \
-                and player.position.x + player.size.x < MAP_WIDTH:
-            delta += (1,0)
-        if sf.Keyboard.is_key_pressed(sf.Keyboard.UP) \
-                and player.position.y > 0:
-            delta += (0,-1)
-        elif sf.Keyboard.is_key_pressed(sf.Keyboard.DOWN) \
-                and player.position.y + player.size.y < MAP_HEIGHT:
-            delta += (0,1)
-
-        elif sf.Keyboard.is_key_pressed(sf.Keyboard.ESCAPE):
-            window.close()
-
-        if sf.Keyboard.is_key_pressed(sf.Keyboard.L_SHIFT):
-            debug.append("sprint")
-            delta *= 8
-        else:
-            delta *= 2
+        delta = player_movement_vector(player)
 
         view_delta = sf.Vector2()
         if player.position.x > WIDTH / 2 \
