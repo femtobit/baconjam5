@@ -62,7 +62,8 @@ class Player(Actor):
         self.sprite = sf.Sprite(player)
         self.position = (x, y)
 
-        self.health = 5
+        self.max_health = 5
+        self.health = self.max_health
         self.max_stamina = 3
         self.stamina = self.max_stamina
 
@@ -114,7 +115,7 @@ class Monster(Actor):
 
     def hunt_player(self, player, dt):
         player_direction = player.position - self.position
-        delta = (player_direction / norm(player_direction)) * self.speed
+        delta = (player_direction / norm(player_direction)) * self.speed * 2
 
         self.move(delta, dt)
 
@@ -166,8 +167,9 @@ class Lives(Actor):
         self.sprite.position = (x, y)
 
     def heal(self, player):
-        player.health += self.health
-        sound.heal.play()
+        if player.health < player.max_health:
+            player.health += self.health
+            sound.heal.play()
 
 class Treasure(Actor):
     def __init__(self, x, y):
@@ -177,5 +179,4 @@ class Treasure(Actor):
 
     def win_condition(self, player):
         return self.collides_with(player)
-            
-            
+

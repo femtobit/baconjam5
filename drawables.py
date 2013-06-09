@@ -23,10 +23,15 @@ class PointDisplay(sf.Drawable):
     def draw(self, target, states):
         dx = self.rect.width / self.max_points
         width = self.rect.width / (self.max_points + 1)
-        for i in range(0, self.points):
+        for i in range(0, self.max_points):
             shape = sf.RectangleShape((width, self.rect.height))
-            shape.fill_color = self.color
-            shape.position = (self.rect.position.y + i * dx,
+            shape.outline_color = self.color
+            shape.outline_thickness = 1
+            if i < self.points:
+                shape.fill_color = self.color
+            else:
+                shape.fill_color = sf.Color.TRANSPARENT
+            shape.position = (self.rect.position.x + i * dx,
                                     self.rect.position.y)
             target.draw(shape, states)
 
