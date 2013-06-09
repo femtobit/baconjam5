@@ -135,7 +135,7 @@ def main():
         for h in lives:
             if h.collides_with(player):
                 lives.remove(h)
-                player.health += 1
+                h.heal(player)
 
         for event in window.events:
             if type(event) is sf.CloseEvent:
