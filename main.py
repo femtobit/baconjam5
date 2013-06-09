@@ -29,6 +29,23 @@ class Overlay(sf.Drawable):
         self.sprite.position = center - self.texture.size / 2
         target.draw(self.sprite)
 
+class PointDisplay(sf.Drawable):
+    def __init__(self, rect, max_points, color):
+        self.rect = rect
+        self.max_points = max_points
+        self.points = max_points
+        self.color = color
+
+    def draw(self, target, states):
+        dx = self.rect.width / self.max_points
+        width = self.rect.width / (self.max_points + 1)
+        for i in range(0, self.points):
+            shape = sf.RectangleShape((width, self.rect.height))
+            shape.fill_color = self.color
+            shape.position = (self.rect.position.y + i * dx,
+                                    self.rect.position.y)
+            target.draw(shape, states)
+
 def main():
     random.seed(datetime.datetime.now())
 
@@ -60,6 +77,9 @@ def main():
     window.view = view
 
     overlay = Overlay(player)
+
+    life_point_display = PointDisplay(sf.Rectangle((WIDTH - 100, 10), (100, 10)),
+            player.health, sf.Color.RED)
 
     step_timer = sf.Clock()
 
@@ -135,11 +155,14 @@ def main():
         window.draw(overlay)
 
         window.view = window.default_view
+
         debug_text = sf.Text(", ".join(debug))
         debug_text.color = sf.Color.RED
         debug_text.position = (0, HEIGHT - 20)
         debug_text.character_size = 12
         window.draw(debug_text)
+        life_point_display.points = player.health
+        window.draw(life_point_display)
 
         window.display()
 
