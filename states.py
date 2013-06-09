@@ -140,8 +140,8 @@ class GameState(State):
         self.debug.append("(dt=%i/16 ms)" % dt) 
 
         if not self.has_treasure and self.treasure_time.elapsed_time >= sf.seconds(120):
-            self.treasure = Treasure(random_point_not_near(self.player.position))
-            self.boss = Boss(random_point_not_near(self.player.position))
+            self.treasure = Treasure(*random_point_not_near(self.player.position))
+            self.boss = Boss(*random_point_not_near(self.player.position))
             self.creatures.append(boss)
 
             print("Treasure spawned at %s" % self.treasure.position)
