@@ -58,7 +58,7 @@ class GameState(State):
         self.lives = []
 
         self.player = Player(WIDTH / 2, HEIGHT / 2)
-        
+
         for i in range (0, NUMBER_OF_GRUES):
             while True:
                 point = (random.randrange(0, MAP_WIDTH),
@@ -86,6 +86,9 @@ class GameState(State):
                 self.player.health, sf.Color.RED)
 
         self.boss_time = sf.Clock()
+        self.run_timer = sf.Clock()
+
+        self.is_running = False
 
     def step(self, dt):
         self.debug = []
@@ -115,8 +118,25 @@ class GameState(State):
         for event in self.window.events:
             if type(event) is sf.CloseEvent:
                 self.window.close()
+            elif type(event) is sf.KeyEvent and event.code == sf.Keyboard.L_SHIFT:
+                if event.pressed and not self.is_running:
+                    self.is_running = True
+                    self.run_timer.restart()
+                elif event.released and self.is_running:
+                    self.is_running = False
+                    self.player.stamina -= 1
 
-        delta = self.player_movement_vector(self.player)
+        if self.is_running and self.run_timer.elapsed_time >= sf.seconds(1):
+            self.is_running = False
+            self.player.stamina -= 1
+
+        if self.is_running:
+            self.debug.append("sprint (" + str(self.run_timer.elapsed_time.seconds) + ")")
+
+        if self.player.stamina > 0:
+            delta = self.player_movement_vector(self.player)
+        else:
+            delta = sf.Vector2()
 
         view_delta = sf.Vector2()
         if self.player.position.x > WIDTH / 2 \
@@ -140,7 +160,7 @@ class GameState(State):
         for creature in self.creatures:
             creature.step(self.player, dt)
             creature.sound_tick()
-             
+
         self.life_point_display.points = self.player.health
 
     def draw(self):
@@ -180,7 +200,7 @@ class GameState(State):
                     delta += (0,1)
         delta = normalize(delta)
 
-        if sf.Keyboard.is_key_pressed(sf.Keyboard.L_SHIFT):
+        if self.is_running:
             delta *= 8
         else:
             delta *= 2

@@ -40,7 +40,8 @@ class Actor(sf.Drawable):
     def collides_with(self, object):
         r1 = collision_rectangle(self)
         r2 = collision_rectangle(object)
-        if ((r1.right < r2.left) or (r2.right < r1.left) or (r1.bottom < r2.top) or (r2.bottom < r1.top)):
+        if ((r1.right < r2.left) or (r2.right < r1.left) or (r1.bottom < r2.top) \
+                or (r2.bottom < r1.top)):
             return False
         else:
             return True
@@ -60,7 +61,10 @@ class Player(Actor):
         player = sf.Texture.from_file("player.png")
         self.sprite = sf.Sprite(player)
         self.position = (x, y)
+
         self.health = 5
+        self.max_stamina = 3
+        self.stamina = self.max_stamina
 
     def draw(self, target, states):
         target.draw(self.sprite, states)
