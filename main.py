@@ -10,6 +10,7 @@ import sfml as sf
 from actors import *
 from constants import *
 from drawables import *
+import sound
 from states import *
 from helpers import *
 
@@ -17,7 +18,10 @@ def main():
     random.seed(datetime.datetime.now())
 
     window = sf.RenderWindow(sf.VideoMode(WIDTH, HEIGHT), "A Walk In The Dark")
-    
+    sound.ambient.loop = True
+    sound.ambient.volume = 10
+    sound.ambient.play()
+
     state_counter = 0
     current_state = IntroState(window)
     last_state = None

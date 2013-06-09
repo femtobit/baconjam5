@@ -145,6 +145,7 @@ class GameState(State):
             self.treasure = Treasure(*random_point_not_near(self.player.position))
             self.boss = Boss(*random_point_not_near(self.player.position))
             self.creatures.append(self.boss)
+            sound.boss1.play()
 
             print("Treasure spawned at %s" % self.treasure.position)
             self.has_treasure = True

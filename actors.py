@@ -144,8 +144,8 @@ class Grue(Monster):
         super(Grue, self).bite(player)
 
     def play_sound(self):
-        sound.grue.position = vector2to3(self.position)
         if sound.grue.status != sf.SoundSource.PLAYING:
+            sound.grue.position = vector2to3(self.position)
             sound.grue.attenuation = 150
             sound.grue.play()
 
@@ -155,6 +155,7 @@ class Boss(Monster):
         big_monster = sf.Texture.from_file("big_monster.png")
         self.sprite = sf.Sprite(big_monster)
         self.sprite.position = (x, y)
+        self.sound_rarity = 1200
 
         self.speed = 1.10
         self.damage = 5
@@ -162,8 +163,12 @@ class Boss(Monster):
     def step(self, player, is_dark, dt):
         self.hunt_player(player, dt)
 
-    def kill(self, player):
-        pass
+    def play_sound(self):
+        print("play boss")
+        snd = random.choice([sound.boss1, sound.boss2])
+        if snd.status != sf.SoundSource.PLAYING:
+            snd.position = vector2to3(self.postion)
+            snd.play()
 
 class Lives(Actor):
     def __init__(self, x, y):
