@@ -66,9 +66,11 @@ class GameWonState(State):
             if type(event) == sf.KeyEvent and event.pressed:
                 if event.code == sf.Keyboard.ESCAPE:
                     self.has_ended = True
+                    self.next_state = None
                 elif event.code == sf.Keyboard.RETURN:
                     self.has_ended = True
-                    self.next_state = None
+                    self.next_state = GameState
+
 
 class GameOverState(State):
     def __init__(self, window):
